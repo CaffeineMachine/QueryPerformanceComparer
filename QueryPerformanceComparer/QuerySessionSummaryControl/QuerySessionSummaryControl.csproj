@@ -35,6 +35,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -43,11 +46,19 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ReportSummary.xaml.cs">
+      <DependentUpon>ReportSummary.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="StatSummaryControl.xaml.cs">
+      <DependentUpon>StatSummaryControl.xaml</DependentUpon>
+    </Compile>
     <Page Include="QuerySessionControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -56,6 +67,14 @@
       <DependentUpon>QuerySessionControl.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ReportSummary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StatSummaryControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -80,6 +99,16 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\QuerySessionSummaryLib\QuerySessionSummaryLib.csproj">
+      <Project>{1A30F2C9-AE44-4912-AA9D-B4F9A0D72599}</Project>
+      <Name>QuerySessionSummaryLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WebClientPerfLib\WebClientPerfLib.csproj">
+      <Project>{6571FFA3-DFB6-4ED8-8321-39B22C3F59E9}</Project>
+      <Name>WebClientPerfLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

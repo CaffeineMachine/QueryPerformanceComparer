@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="QuerySessionSummaryControl.ReportSummary"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:querySessionSummaryControl="clr-namespace:QuerySessionSummaryControl"
+             mc:Ignorable="d" >
+    <Grid>
+        <TabControl>
+            <TabItem Header="Summary">
+                <querySessionSummaryControl:StatSummaryControl x:Name="statSummary"/>
+            </TabItem>
+            <TabItem Header="Graph">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <CheckBox Checked="DataLabels_OnChecked" Unchecked="DataLabels_OnChecked" Name="showValues">Show values on graph?</CheckBox>
+                    <WindowsFormsHost Grid.Row="1" Name="controlHost" Grid.ColumnSpan="4"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>
