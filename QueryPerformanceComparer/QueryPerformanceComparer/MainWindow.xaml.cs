@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using QuerySessionSummaryControl;
 
 namespace QueryPerformanceComparer
 {
@@ -19,9 +20,23 @@ namespace QueryPerformanceComparer
     /// </summary>
     public partial class MainWindow : Window
     {
+        private int sessions = 0;
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Quit_OnClick(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        private void CreateSession_OnClick(object sender, RoutedEventArgs e)
+        {
+            var querySessionControl = new QuerySessionControl();
+            querySessionControl.Header = string.Format("Session{0}", ++sessions);
+            tabs.Items.Add(querySessionControl);
+            querySessionControl.IsSelected = true;
         }
     }
 }
