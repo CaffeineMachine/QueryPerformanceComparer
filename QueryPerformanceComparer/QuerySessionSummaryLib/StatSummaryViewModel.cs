@@ -21,6 +21,7 @@ namespace QuerySessionSummaryLib
             Maximum = _runtimes.Max().TotalMilliseconds;
             Mean = _runtimes.Average(x => x.TotalMilliseconds);
             Median = _runtimes[runtimes.Count()/2].TotalMilliseconds;
+            TotalRuntime = _runtimes.Select(x => x.TotalMilliseconds).Sum();
         }
 
         private double _minimum;
@@ -75,6 +76,20 @@ namespace QuerySessionSummaryLib
                 {
                     _median = value;
                     OnPropertyChanged("Median");
+                }
+            }
+        }
+
+        private double _totalRuntime;
+        public double TotalRuntime
+        {
+            get { return _totalRuntime; }
+            set
+            {
+                if (_totalRuntime != value)
+                {
+                    _totalRuntime = value;
+                    OnPropertyChanged("TotalRuntime");
                 }
             }
         }

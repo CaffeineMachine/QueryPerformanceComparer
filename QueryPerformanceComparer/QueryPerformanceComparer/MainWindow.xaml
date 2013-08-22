@@ -11,6 +11,7 @@
         <Menu Grid.Row="0" IsMainMenu="True">
             <MenuItem Header="_File">
                 <MenuItem Header="_New Session" Click="CreateSession_OnClick"/>
+                <MenuItem Header="_Print" Click="PrintSession_OnClick"/>
                 <MenuItem Header="_Quit" Click="Quit_OnClick"/>
             </MenuItem>
         </Menu>

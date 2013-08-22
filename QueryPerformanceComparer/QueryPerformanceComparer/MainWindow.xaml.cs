@@ -21,6 +21,7 @@ namespace QueryPerformanceComparer
     public partial class MainWindow : Window
     {
         private int sessions = 0;
+        private QuerySessionControl _currentSession;
         public MainWindow()
         {
             InitializeComponent();
@@ -34,9 +35,19 @@ namespace QueryPerformanceComparer
         private void CreateSession_OnClick(object sender, RoutedEventArgs e)
         {
             var querySessionControl = new QuerySessionControl();
+            _currentSession = querySessionControl;
             querySessionControl.Header = string.Format("Session{0}", ++sessions);
             tabs.Items.Add(querySessionControl);
             querySessionControl.IsSelected = true;
+        }
+
+        private void PrintSession_OnClick(object sender, RoutedEventArgs e)
+        {
+            var printDialog = new PrintDialog();
+            if (printDialog.ShowDialog() == true)
+            {
+                printDialog.PrintVisual(_currentSession, "Print Performance Session Report");
+            }
         }
     }
 }

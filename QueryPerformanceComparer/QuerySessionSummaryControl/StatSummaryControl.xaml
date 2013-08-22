@@ -17,6 +17,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Label Grid.Row="0" Grid.Column="0">Minimum:</Label>
@@ -27,5 +28,7 @@
         <Label Grid.Row="2" Grid.Column="1" Content="{Binding Mean}" />
         <Label Grid.Row="3" Grid.Column="0">Median:</Label>
         <Label Grid.Row="3" Grid.Column="1" Content="{Binding Median}" />
+        <Label Grid.Row="4" Grid.Column="0">Total Runtime:</Label>
+        <Label Grid.Row="4" Grid.Column="1" Content="{Binding TotalRuntime}" />
     </Grid>
 </UserControl>
