@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using QuerySessionSummaryControl;
+using Ninject;
 
 namespace QueryPerformanceComparer
 {
@@ -20,11 +12,14 @@ namespace QueryPerformanceComparer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private int sessions = 0;
-        private QuerySessionControl _currentSession;
+        private readonly IKernel _kernel;
         public MainWindow()
         {
             InitializeComponent();
+            _kernel = new StandardKernel();
+            LoadAllBinDirectoryAssemblies();
+            if (File.Exists("TypeMappings.xml"))
+                _kernel.Load("TypeMappings.xml");
         }
 
         private void Quit_OnClick(object sender, RoutedEventArgs e)
@@ -32,22 +27,31 @@ namespace QueryPerformanceComparer
             Application.Current.Shutdown();
         }
 
-        private void CreateSession_OnClick(object sender, RoutedEventArgs e)
-        {
-            var querySessionControl = new QuerySessionControl();
-            _currentSession = querySessionControl;
-            querySessionControl.Header = string.Format("Session{0}", ++sessions);
-            tabs.Items.Add(querySessionControl);
-            querySessionControl.IsSelected = true;
-        }
-
         private void PrintSession_OnClick(object sender, RoutedEventArgs e)
         {
             var printDialog = new PrintDialog();
             if (printDialog.ShowDialog() == true)
             {
-                printDialog.PrintVisual(_currentSession, "Print Performance Session Report");
+                //printDialog.PrintVisual(_currentSession, "Print Performance Session Report");
             }
+        }
+
+        public void LoadAllBinDirectoryAssemblies()
+        {
+            var binPath = AppDomain.CurrentDomain.BaseDirectory; // note: don't use CurrentEntryAssembly or anything like that.
+
+            foreach (var dll in Directory.GetFiles(binPath, "*.dll", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    Assembly.LoadFile(dll);
+                }
+                catch (FileLoadException)
+                { } // The Assembly has already been loaded.
+                catch (BadImageFormatException)
+                { } // If a BadImageFormatException exception is thrown, the file is not an assembly.
+
+            } // foreach dll
         }
     }
 }

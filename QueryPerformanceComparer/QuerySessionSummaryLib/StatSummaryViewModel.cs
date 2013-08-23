@@ -9,11 +9,17 @@ namespace QuerySessionSummaryLib
     public class StatSummaryViewModel : INotifyPropertyChanged
     {
         private List<TimeSpan> _runtimes;
-        public StatSummaryViewModel() : this(new List<TimeSpan> {new TimeSpan(0)})
+        public StatSummaryViewModel() : this(string.Empty, new List<TimeSpan> {new TimeSpan(0)})
         {
         }
 
-        public StatSummaryViewModel(IEnumerable<TimeSpan> runtimes)
+        public StatSummaryViewModel(string request, IEnumerable<TimeSpan> runtimes)
+        {
+            Request = request;
+            RecalculateProperties(runtimes);
+        }
+
+        public void RecalculateProperties(IEnumerable<TimeSpan> runtimes)
         {
             _runtimes = runtimes.ToList();
             _runtimes.Sort();
@@ -92,6 +98,25 @@ namespace QuerySessionSummaryLib
                     OnPropertyChanged("TotalRuntime");
                 }
             }
+        }
+
+        private string _request;
+        public string Request
+        {
+            get { return _request; }
+            set
+            {
+                if (_request != value)
+                {
+                    _request = value;
+                    OnPropertyChanged("Request");
+                }
+            }
+        }
+
+        public List<TimeSpan> Runtimes
+        {
+            get { return _runtimes; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

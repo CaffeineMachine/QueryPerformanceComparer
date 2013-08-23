@@ -53,12 +53,19 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IndividualRuntimeControl.xaml.cs">
+      <DependentUpon>IndividualRuntimeControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ReportSummary.xaml.cs">
       <DependentUpon>ReportSummary.xaml</DependentUpon>
     </Compile>
     <Compile Include="StatSummaryControl.xaml.cs">
       <DependentUpon>StatSummaryControl.xaml</DependentUpon>
     </Compile>
+    <Page Include="IndividualRuntimeControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="QuerySessionControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

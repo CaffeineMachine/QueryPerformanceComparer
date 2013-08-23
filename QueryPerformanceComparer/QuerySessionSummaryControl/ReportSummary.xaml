@@ -10,7 +10,7 @@
             <TabItem Header="Summary">
                 <querySessionSummaryControl:StatSummaryControl x:Name="statSummary"/>
             </TabItem>
-            <TabItem Header="Graph">
+            <TabItem Header="Individual Runtimes Graph">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -19,6 +19,9 @@
                     <CheckBox Checked="DataLabels_OnChecked" Unchecked="DataLabels_OnChecked" Name="showValues">Show values on graph?</CheckBox>
                     <WindowsFormsHost Grid.Row="1" Name="controlHost" Grid.ColumnSpan="4"/>
                 </Grid>
+            </TabItem>
+            <TabItem Header="Individual Runtimes Grid">
+                <querySessionSummaryControl:IndividualRuntimeControl x:Name="individualRuntime"/>
             </TabItem>
         </TabControl>
     </Grid>

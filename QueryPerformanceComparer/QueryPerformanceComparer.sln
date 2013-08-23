@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebClientPerfLib.Tests", "W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuerySessionSummaryLib", "QuerySessionSummaryLib\QuerySessionSummaryLib.csproj", "{1A30F2C9-AE44-4912-AA9D-B4F9A0D72599}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueryPerformanceComparer.Interfaces", "QueryPerformanceComparer.Interfaces\QueryPerformanceComparer.Interfaces.csproj", "{058A374C-9004-4A30-AB0C-617EF6F7A796}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{1A30F2C9-AE44-4912-AA9D-B4F9A0D72599}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A30F2C9-AE44-4912-AA9D-B4F9A0D72599}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A30F2C9-AE44-4912-AA9D-B4F9A0D72599}.Release|Any CPU.Build.0 = Release|Any CPU
+		{058A374C-9004-4A30-AB0C-617EF6F7A796}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{058A374C-9004-4A30-AB0C-617EF6F7A796}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{058A374C-9004-4A30-AB0C-617EF6F7A796}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{058A374C-9004-4A30-AB0C-617EF6F7A796}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

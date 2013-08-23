@@ -3,8 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             mc:Ignorable="d" >
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -18,17 +17,20 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Grid.Column="0">Minimum:</Label>
-        <Label Grid.Row="0" Grid.Column="1" Content="{Binding Minimum}"/>
-        <Label Grid.Row="1" Grid.Column="0">Maximum:</Label>
-        <Label Grid.Row="1" Grid.Column="1" Content="{Binding Maximum}" />
-        <Label Grid.Row="2" Grid.Column="0">Mean:</Label>
-        <Label Grid.Row="2" Grid.Column="1" Content="{Binding Mean}" />
-        <Label Grid.Row="3" Grid.Column="0">Median:</Label>
-        <Label Grid.Row="3" Grid.Column="1" Content="{Binding Median}" />
-        <Label Grid.Row="4" Grid.Column="0">Total Runtime:</Label>
-        <Label Grid.Row="4" Grid.Column="1" Content="{Binding TotalRuntime}" />
+        <Label Grid.Row="0" Grid.Column="0">Request:</Label>
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Request}" IsReadOnly="True"/>
+        <Label Grid.Row="1" Grid.Column="0">Minimum:</Label>
+        <Label Grid.Row="1" Grid.Column="1" Content="{Binding Minimum}"/>
+        <Label Grid.Row="2" Grid.Column="0">Maximum:</Label>
+        <Label Grid.Row="2" Grid.Column="1" Content="{Binding Maximum}" />
+        <Label Grid.Row="3" Grid.Column="0">Mean:</Label>
+        <Label Grid.Row="3" Grid.Column="1" Content="{Binding Mean}" />
+        <Label Grid.Row="4" Grid.Column="0">Median:</Label>
+        <Label Grid.Row="4" Grid.Column="1" Content="{Binding Median}" />
+        <Label Grid.Row="5" Grid.Column="0">Total Runtime:</Label>
+        <Label Grid.Row="5" Grid.Column="1" Content="{Binding TotalRuntime}" />
     </Grid>
 </UserControl>
