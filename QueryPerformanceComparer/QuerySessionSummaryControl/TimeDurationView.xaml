@@ -12,10 +12,10 @@
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal">
-            <Button Click="LoadQueries_OnClick">Load Queries</Button>
             <Button Click="LoadUrls_OnClick">Load Urls</Button>
+            <Button Click="LoadQueries_OnClick">Load Queries</Button>
             <Label>Run test for (minutes):</Label>
-            <TextBox Width="40" x:Name="testTime"></TextBox>
+            <TextBox Width="40" x:Name="TestTime"></TextBox>
             <Button Click="RunTests_OnClick">Run Tests</Button>
             <Button Click="SerializeResults_OnClick">Serialize Results</Button>
         </StackPanel>

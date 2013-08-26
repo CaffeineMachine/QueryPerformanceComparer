@@ -27,8 +27,8 @@ namespace QuerySessionSummaryControl
             var wrapper = new WebClientPerfWrapper();
             var runtimes = new List<TimeSpan>();
             int numTries;
-            var request = string.Format("{0}?{1}", urlPath.Text, query.Text);
-            if (!Int32.TryParse(tries.Text, out numTries))
+            var request = string.Format("{0}?{1}", UrlPath.Text, Query.Text);
+            if (!Int32.TryParse(Tries.Text, out numTries))
             {
                 MessageBox.Show("Number of tries is not an integer.");
                 return;
@@ -46,18 +46,18 @@ namespace QuerySessionSummaryControl
             if (!_requests.Contains(request))
             {
                 this.ReportSummary.AddDataToChart(request, runtimes);
-                this.ReportSummary.statSummary.ViewModel = new StatSummaryViewModel(request, runtimes);
-                this.ReportSummary.individualRuntime.ViewModel = new IndividualRuntimeViewModel(runtimes);
+                this.ReportSummary.StatSummary.ViewModel = new StatSummaryViewModel(request, runtimes);
+                this.ReportSummary.IndividualRuntime.ViewModel = new IndividualRuntimeViewModel(runtimes);
                 _requests.Add(request);
             }
             else
             {
                 this.ReportSummary.MergeDataToChart(request, runtimes);
-                var newModelData = ReportSummary.statSummary.ViewModel.Runtimes;
+                var newModelData = ReportSummary.StatSummary.ViewModel.Runtimes;
                 newModelData.AddRange(runtimes);
-                this.ReportSummary.statSummary.ViewModel = new StatSummaryViewModel(request, newModelData);
+                this.ReportSummary.StatSummary.ViewModel = new StatSummaryViewModel(request, newModelData);
                 foreach (var item in runtimes)
-                    this.ReportSummary.individualRuntime.ViewModel.Runtimes.Add(item.TotalMilliseconds);
+                    this.ReportSummary.IndividualRuntime.ViewModel.Runtimes.Add(item.TotalMilliseconds);
             }
 
         }
@@ -74,7 +74,7 @@ namespace QuerySessionSummaryControl
                     {
                         var serializer =
                             new DataContractSerializer(typeof(StatSummaryViewModel));
-                        serializer.WriteObject(fs, ReportSummary.statSummary.ViewModel);
+                        serializer.WriteObject(fs, ReportSummary.StatSummary.ViewModel);
                     }
                 }
                 catch (Exception)

@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows;
-using System.Windows.Controls;
 using Microsoft.Win32;
 using QuerySessionSummaryLib;
 using WebClientPerfLib;
@@ -14,80 +14,73 @@ namespace QuerySessionSummaryControl
     /// <summary>
     /// Interaction logic for TimeDurationView.xaml
     /// </summary>
-    public partial class TimeDurationView : UserControl
+    public partial class TimeDurationView
     {
+        private IEnumerable<double> _resultRuntimes;
         public TimeDurationView()
         {
             InitializeComponent();
-            this.DataContext = new TimeDurationViewModel();
+            DataContext = new TimeDurationViewModel();
+            _resultRuntimes = new List<double>();
         }
 
         private void LoadQueries_OnClick(object sender, RoutedEventArgs e)
         {
-            (this.DataContext as TimeDurationViewModel).Queries.Clear();
-            var dialog = new OpenFileDialog();
-            dialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            if (dialog.ShowDialog() == true)
+            var timeDurationViewModel = DataContext as TimeDurationViewModel;
+            if (timeDurationViewModel == null)
+                DataContext = new TimeDurationViewModel();
+            (DataContext as TimeDurationViewModel).Queries.Clear();
+            var dialog = new OpenFileDialog {InitialDirectory = AppDomain.CurrentDomain.BaseDirectory};
+            if (dialog.ShowDialog() != true) return;
+            using (var fs = File.OpenRead(dialog.FileName))
             {
-                try
+                using (TextReader reader = new StreamReader(fs))
                 {
-                    using (var fs = File.OpenRead(dialog.FileName))
-                    {
-                        using (TextReader reader = new StreamReader(fs))
-                        {
-                            while (reader.Peek() >= 0)
-                                (this.DataContext as TimeDurationViewModel).Queries.Add(reader.ReadLine());
-                        }
-                    }
-
-                }
-                catch (Exception)
-                {
-
-                    throw;
+                    while (reader.Peek() >= 0)
+                        (DataContext as TimeDurationViewModel).Queries.Add(reader.ReadLine());
                 }
             }
         }
 
         private void LoadUrls_OnClick(object sender, RoutedEventArgs e)
         {
-            (this.DataContext as TimeDurationViewModel).Urls.Clear();
-            var dialog = new OpenFileDialog();
-            dialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            if (dialog.ShowDialog() == true)
+            var durationViewModel = DataContext as TimeDurationViewModel;
+            if (durationViewModel == null)
+                DataContext = new TimeDurationViewModel();
+            var dialog = new OpenFileDialog { InitialDirectory = AppDomain.CurrentDomain.BaseDirectory };
+            if (dialog.ShowDialog() != true) return;
+
+            using (var fs = File.OpenRead(dialog.FileName))
             {
-                try
+                using (TextReader reader = new StreamReader(fs))
                 {
-                    using (var fs = File.OpenRead(dialog.FileName))
+                    while (reader.Peek() >= 0)
                     {
-                        using (TextReader reader = new StreamReader(fs))
-                        {
-                            while (reader.Peek() >= 0)
-                                (this.DataContext as TimeDurationViewModel).Urls.Add(reader.ReadLine());
-                        }
+                        (DataContext as TimeDurationViewModel).Urls.Add(reader.ReadLine());
                     }
-
-                }
-                catch (Exception)
-                {
-
-                    throw;
                 }
             }
         }
 
         private void RunTests_OnClick(object sender, RoutedEventArgs e)
         {
-            var queries = (this.DataContext as TimeDurationViewModel).Queries;
-            var urls = (this.DataContext as TimeDurationViewModel).Urls;
+            var durationViewModel = DataContext as TimeDurationViewModel;
+            if (durationViewModel == null)
+            {
+                MessageBox.Show("ViewModel null, Aborting tests");
+                return;
+            }
+
+            var queries = durationViewModel.Queries;
+            var urls = durationViewModel.Urls;
             if (!queries.Any())
             {
                 MessageBox.Show("No queries loaded. Aborting tests");
                 return;
             }
 
-            double time = 0;
-            if (!Double.TryParse(testTime.Text, out time))
+            double time;
+            if (!Double.TryParse(TestTime.Text, out time))
             {
                 return;
             }
@@ -100,14 +93,13 @@ namespace QuerySessionSummaryControl
                 {
                     if (sw.ElapsedMilliseconds >= time * 60 * 1000)
                         break;
-                    string request = string.Empty;
                     if (urls.Any())
                     {
                         foreach (var url in urls)
                         {
                             if (sw.ElapsedMilliseconds >= time * 60 * 1000)
                                 break;
-                            request = string.Format("{0}?{1}", url, query);
+                            string request = string.Format("{0}?{1}", url, query);
                             wrapper.RunPerformanceRequest(request);
                         }
                     }
@@ -120,29 +112,18 @@ namespace QuerySessionSummaryControl
 
             }
             sw.Stop();
-            wrapper.OutputTimesToLog();
+            _resultRuntimes = wrapper.GetResultRuntimes();
         }
 
         private void SerializeResults_OnClick(object sender, RoutedEventArgs e)
         {
-            var dialog = new SaveFileDialog();
-            dialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            if (dialog.ShowDialog() == true)
+            var dialog = new SaveFileDialog { InitialDirectory = AppDomain.CurrentDomain.BaseDirectory };
+            if (dialog.ShowDialog() != true) return;
+            using (var fs = File.Create(dialog.FileName))
             {
-                try
-                {
-                    using (var fs = File.Create(dialog.FileName))
-                    {
-                        var serializer =
-                            new DataContractSerializer(typeof(TimeDurationViewModel));
-                        serializer.WriteObject(fs, (this.DataContext) as TimeDurationViewModel);
-                    }
-                }
-                catch (Exception)
-                {
-
-                    throw;
-                }
+                var serializer =
+                    new DataContractSerializer(typeof(List<double>));
+                serializer.WriteObject(fs, _resultRuntimes);
             }
         }
     }

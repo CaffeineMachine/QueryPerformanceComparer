@@ -1,7 +1,6 @@
 ﻿<Window x:Class="QueryPerformanceComparer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:querySessionSummaryControl="clr-namespace:QuerySessionSummaryControl;assembly=QuerySessionSummaryControl"
         Title="Query Performance Comparer" Height="600" Width="800">
     <Grid>
         <Grid.RowDefinitions>
@@ -10,16 +9,19 @@
         </Grid.RowDefinitions>
         <Menu Grid.Row="0" IsMainMenu="True">
             <MenuItem Header="_File">
+                <MenuItem Header="Return to Menu" Click="ReturnToMenu_OnClick" />
                 <MenuItem Header="_Quit" Click="Quit_OnClick"/>
             </MenuItem>
         </Menu>
-        <Grid x:Name="gridPanel" Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Grid.Row="0" Click="DurationTest_Click">Run Test For Duration</Button>
-            <Button Grid.Column="1" Grid.Row="0" Click="QuantityTest_Click">Run Test By Count</Button>
+        <Grid x:Name="GridPanel" Grid.Row="1">
+            <Grid x:Name="StartMenu">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Grid.Row="0" Click="DurationTest_Click">Run Test For Duration</Button>
+                <Button Grid.Column="1" Grid.Row="0" Click="QuantityTest_Click">Run Test By Count</Button>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

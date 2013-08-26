@@ -47,18 +47,23 @@ namespace QueryPerformanceComparer
 
         private void DurationTest_Click(object sender, RoutedEventArgs e)
         {
-            gridPanel.Children.Clear();
-            gridPanel.ColumnDefinitions.Clear();
+            GridPanel.Children.Clear();
+            GridPanel.ColumnDefinitions.Clear();
             var timeDurationView = new TimeDurationView();
-            gridPanel.Children.Add(timeDurationView);
+            GridPanel.Children.Add(timeDurationView);
         }
 
         private void QuantityTest_Click(object sender, RoutedEventArgs e)
         {
-            gridPanel.Children.Clear();
-            gridPanel.ColumnDefinitions.Clear();
+            GridPanel.Children.Clear();
             var sessionControl = new QuerySessionControl();
-            gridPanel.Children.Add(sessionControl);
+            GridPanel.Children.Add(sessionControl);
+        }
+
+        private void ReturnToMenu_OnClick(object sender, RoutedEventArgs e)
+        {
+            GridPanel.Children.Clear();
+            GridPanel.Children.Add(StartMenu);
         }
     }
 }

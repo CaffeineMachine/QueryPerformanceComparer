@@ -23,7 +23,7 @@ namespace QuerySessionSummaryControl
         public void GenerateChart()
         {
             _chart.ChartAreas.Add("chtArea");
-            controlHost.Child = _chart;
+            ControlHost.Child = _chart;
             _chart.ChartAreas[0].AxisX.Title = "Runs";
             _chart.ChartAreas[0].AxisX.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
             _chart.ChartAreas[0].AxisY.Title = "Runtime (Milliseconds)";
@@ -38,7 +38,7 @@ namespace QuerySessionSummaryControl
         {
             foreach (var serie in _chart.Series)
             {
-                serie.IsValueShownAsLabel = showValues.IsChecked ?? false;
+                serie.IsValueShownAsLabel = ShowValues.IsChecked ?? false;
             }
         }
 
