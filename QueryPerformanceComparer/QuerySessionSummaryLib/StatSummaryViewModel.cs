@@ -23,12 +23,13 @@ namespace QuerySessionSummaryLib
 
         public void RecalculateProperties(IEnumerable<TimeSpan> runtimes)
         {
-            _runtimes = runtimes.ToList();
+            var timeSpans = runtimes as IList<TimeSpan> ?? runtimes.ToList();
+            _runtimes = timeSpans.ToList();
             _runtimes.Sort();
             Minimum = _runtimes.Min().TotalMilliseconds;
             Maximum = _runtimes.Max().TotalMilliseconds;
             Mean = _runtimes.Average(x => x.TotalMilliseconds);
-            Median = _runtimes[runtimes.Count()/2].TotalMilliseconds;
+            Median = _runtimes[timeSpans.Count()/2].TotalMilliseconds;
             TotalRuntime = _runtimes.Select(x => x.TotalMilliseconds).Sum();
         }
 

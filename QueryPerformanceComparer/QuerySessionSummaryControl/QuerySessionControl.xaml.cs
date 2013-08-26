@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Windows;
-using System.Windows.Controls;
 using Microsoft.Win32;
 using QuerySessionSummaryLib;
 using WebClientPerfLib;
@@ -13,15 +12,19 @@ namespace QuerySessionSummaryControl
     /// <summary>
     /// Interaction logic for QuerySessionControl.xaml
     /// </summary>
-    public partial class QuerySessionControl : UserControl
+    public partial class QuerySessionControl
     {
+        // ReSharper disable FieldCanBeMadeReadOnly.Local
+        private List<string> _requests;
+        // ReSharper restore FieldCanBeMadeReadOnly.Local
+
         public QuerySessionControl()
         {
             InitializeComponent();
-            this.ReportSummary.GenerateChart();
+            ReportSummary.GenerateChart();
+            _requests = new List<string>();
         }
 
-        private List<string> _requests = new List<string>();
         private void RunTests_OnClick(object sender, RoutedEventArgs e)
         {
             var wrapper = new WebClientPerfWrapper();
@@ -45,42 +48,33 @@ namespace QuerySessionSummaryControl
 
             if (!_requests.Contains(request))
             {
-                this.ReportSummary.AddDataToChart(request, runtimes);
-                this.ReportSummary.StatSummary.ViewModel = new StatSummaryViewModel(request, runtimes);
-                this.ReportSummary.IndividualRuntime.ViewModel = new IndividualRuntimeViewModel(runtimes);
+                ReportSummary.AddDataToChart(request, runtimes);
+                ReportSummary.StatSummary.ViewModel = new StatSummaryViewModel(request, runtimes);
+                ReportSummary.IndividualRuntime.ViewModel = new IndividualRuntimeViewModel(runtimes);
                 _requests.Add(request);
             }
             else
             {
-                this.ReportSummary.MergeDataToChart(request, runtimes);
+                ReportSummary.MergeDataToChart(request, runtimes);
                 var newModelData = ReportSummary.StatSummary.ViewModel.Runtimes;
                 newModelData.AddRange(runtimes);
-                this.ReportSummary.StatSummary.ViewModel = new StatSummaryViewModel(request, newModelData);
+                ReportSummary.StatSummary.ViewModel = new StatSummaryViewModel(request, newModelData);
                 foreach (var item in runtimes)
-                    this.ReportSummary.IndividualRuntime.ViewModel.Runtimes.Add(item.TotalMilliseconds);
+                    ReportSummary.IndividualRuntime.ViewModel.Runtimes.Add(item.TotalMilliseconds);
             }
 
         }
 
         private void SerializeResults_OnClick(object sender, RoutedEventArgs e)
         {
-            var dialog = new SaveFileDialog();
-            dialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            var dialog = new SaveFileDialog { InitialDirectory = AppDomain.CurrentDomain.BaseDirectory };
             if (dialog.ShowDialog() == true)
             {
-                try
+                using (var fs = File.Create(dialog.FileName))
                 {
-                    using (var fs = File.Create(dialog.FileName))
-                    {
-                        var serializer =
-                            new DataContractSerializer(typeof(StatSummaryViewModel));
-                        serializer.WriteObject(fs, ReportSummary.StatSummary.ViewModel);
-                    }
-                }
-                catch (Exception)
-                {
-
-                    throw;
+                    var serializer =
+                        new DataContractSerializer(typeof(StatSummaryViewModel));
+                    serializer.WriteObject(fs, ReportSummary.StatSummary.ViewModel);
                 }
             }
         }

@@ -18,6 +18,16 @@
                     <WindowsFormsHost Grid.Row="1" Name="ControlHost" Grid.ColumnSpan="4"/>
                 </Grid>
             </TabItem>
+            <TabItem Header="Cumulative Runtimes Graph">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <CheckBox Checked="CumulativeDataLabels_OnChecked" Unchecked="CumulativeDataLabels_OnChecked" Name="ShowCumulativeValues">Show values on graph?</CheckBox>
+                    <WindowsFormsHost Grid.Row="1" Name="CumulativeGraphControlHost" Grid.ColumnSpan="4"/>
+                </Grid>
+            </TabItem>
             <TabItem Header="Individual Runtimes Grid">
                 <querySessionSummaryControl:IndividualRuntimeControl x:Name="IndividualRuntime"/>
             </TabItem>
