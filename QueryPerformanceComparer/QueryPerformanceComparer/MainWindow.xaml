@@ -9,6 +9,7 @@
         </Grid.RowDefinitions>
         <Menu Grid.Row="0" IsMainMenu="True">
             <MenuItem Header="_File">
+                <MenuItem Header="_Print" Click="PrintItem_OnClick" />
                 <MenuItem Header="Return to Menu" Click="ReturnToMenu_OnClick" />
                 <MenuItem Header="_Quit" Click="Quit_OnClick"/>
             </MenuItem>

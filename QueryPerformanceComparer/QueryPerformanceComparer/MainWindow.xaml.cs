@@ -2,6 +2,8 @@
 using System.IO;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using Ninject;
 using QuerySessionSummaryControl;
 
@@ -64,6 +66,21 @@ namespace QueryPerformanceComparer
         {
             GridPanel.Children.Clear();
             GridPanel.Children.Add(StartMenu);
+        }
+
+        private void PrintItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            Transform transform = this.LayoutTransform;
+            // reset current transform (in case it is scaled or rotated)
+            this.LayoutTransform = null;
+
+            Size size = new Size(this.ActualWidth, this.ActualHeight);
+            this.Measure(size);
+            this.Arrange(new Rect(size));
+
+            // Create a render bitmap and push the surface to it
+            this.UpdateLayout();
+            new PrintDialog().PrintVisual(this, "Report");
         }
     }
 }
