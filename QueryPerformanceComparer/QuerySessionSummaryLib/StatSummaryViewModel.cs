@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using QuerySessionSummaryLib.Annotations;
 
 namespace QuerySessionSummaryLib
 {
+    [DataContract]
     public class StatSummaryViewModel : INotifyPropertyChanged
     {
         private List<TimeSpan> _runtimes;
@@ -31,6 +33,7 @@ namespace QuerySessionSummaryLib
         }
 
         private double _minimum;
+        [DataMember]
         public double Minimum
         {
             get { return _minimum; }
@@ -45,6 +48,7 @@ namespace QuerySessionSummaryLib
         }
 
         private double _maximum;
+        [DataMember]
         public double Maximum
         {
             get { return _maximum; }
@@ -59,6 +63,7 @@ namespace QuerySessionSummaryLib
         }
 
         private double _mean;
+        [DataMember]
         public double Mean
         {
             get { return _mean; }
@@ -73,6 +78,7 @@ namespace QuerySessionSummaryLib
         }
 
         private double _median;
+        [DataMember]
         public double Median
         {
             get { return _median; }
@@ -87,6 +93,7 @@ namespace QuerySessionSummaryLib
         }
 
         private double _totalRuntime;
+        [DataMember]
         public double TotalRuntime
         {
             get { return _totalRuntime; }
@@ -101,6 +108,7 @@ namespace QuerySessionSummaryLib
         }
 
         private string _request;
+        [DataMember]
         public string Request
         {
             get { return _request; }
@@ -114,6 +122,7 @@ namespace QuerySessionSummaryLib
             }
         }
 
+        [DataMember]
         public List<TimeSpan> Runtimes
         {
             get { return _runtimes; }

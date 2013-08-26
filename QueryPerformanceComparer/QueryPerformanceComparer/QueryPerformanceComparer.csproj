@@ -52,6 +52,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -114,6 +115,10 @@
     <ProjectReference Include="..\QuerySessionSummaryControl\QuerySessionSummaryControl.csproj">
       <Project>{4c937918-5ea4-486c-a265-87fef98c1e06}</Project>
       <Name>QuerySessionSummaryControl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\QuerySessionSummaryLib\QuerySessionSummaryLib.csproj">
+      <Project>{1A30F2C9-AE44-4912-AA9D-B4F9A0D72599}</Project>
+      <Name>QuerySessionSummaryLib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

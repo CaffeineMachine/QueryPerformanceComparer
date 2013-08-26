@@ -10,10 +10,16 @@
         </Grid.RowDefinitions>
         <Menu Grid.Row="0" IsMainMenu="True">
             <MenuItem Header="_File">
-                <MenuItem Header="_Print" Click="PrintSession_OnClick"/>
                 <MenuItem Header="_Quit" Click="Quit_OnClick"/>
             </MenuItem>
         </Menu>
-        <querySessionSummaryControl:QuerySessionControl Grid.Row="1"/>
+        <Grid x:Name="gridPanel" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Grid.Row="0" Click="DurationTest_Click">Run Test For Duration</Button>
+            <Button Grid.Column="1" Grid.Row="0" Click="QuantityTest_Click">Run Test By Count</Button>
+        </Grid>
     </Grid>
 </Window>

@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="QuerySessionSummaryControl.TimeDurationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+            <Button Click="LoadQueries_OnClick">Load Queries</Button>
+            <Button Click="LoadUrls_OnClick">Load Urls</Button>
+            <Label>Run test for (minutes):</Label>
+            <TextBox Width="40" x:Name="testTime"></TextBox>
+            <Button Click="RunTests_OnClick">Run Tests</Button>
+            <Button Click="SerializeResults_OnClick">Serialize Results</Button>
+        </StackPanel>
+        <Label Grid.Row="1" Grid.Column="0">Urls</Label>
+        <ListBox Grid.Column="0" Grid.Row="2" ItemsSource="{Binding Urls}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
+        <Label Grid.Row="1" Grid.Column="1">Queries</Label>
+        <ListBox Grid.Column="1" Grid.Row="2" ItemsSource="{Binding Queries}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+    </Grid>
+</UserControl>

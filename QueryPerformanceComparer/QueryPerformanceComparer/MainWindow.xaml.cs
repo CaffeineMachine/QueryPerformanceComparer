@@ -2,8 +2,8 @@
 using System.IO;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Controls;
 using Ninject;
+using QuerySessionSummaryControl;
 
 namespace QueryPerformanceComparer
 {
@@ -27,15 +27,6 @@ namespace QueryPerformanceComparer
             Application.Current.Shutdown();
         }
 
-        private void PrintSession_OnClick(object sender, RoutedEventArgs e)
-        {
-            var printDialog = new PrintDialog();
-            if (printDialog.ShowDialog() == true)
-            {
-                //printDialog.PrintVisual(_currentSession, "Print Performance Session Report");
-            }
-        }
-
         public void LoadAllBinDirectoryAssemblies()
         {
             var binPath = AppDomain.CurrentDomain.BaseDirectory; // note: don't use CurrentEntryAssembly or anything like that.
@@ -52,6 +43,22 @@ namespace QueryPerformanceComparer
                 { } // If a BadImageFormatException exception is thrown, the file is not an assembly.
 
             } // foreach dll
+        }
+
+        private void DurationTest_Click(object sender, RoutedEventArgs e)
+        {
+            gridPanel.Children.Clear();
+            gridPanel.ColumnDefinitions.Clear();
+            var timeDurationView = new TimeDurationView();
+            gridPanel.Children.Add(timeDurationView);
+        }
+
+        private void QuantityTest_Click(object sender, RoutedEventArgs e)
+        {
+            gridPanel.Children.Clear();
+            gridPanel.ColumnDefinitions.Clear();
+            var sessionControl = new QuerySessionControl();
+            gridPanel.Children.Add(sessionControl);
         }
     }
 }

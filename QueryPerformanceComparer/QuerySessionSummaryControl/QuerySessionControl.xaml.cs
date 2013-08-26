@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
 using QuerySessionSummaryLib;
 using WebClientPerfLib;
 
@@ -57,6 +60,29 @@ namespace QuerySessionSummaryControl
                     this.ReportSummary.individualRuntime.ViewModel.Runtimes.Add(item.TotalMilliseconds);
             }
 
+        }
+
+        private void SerializeResults_OnClick(object sender, RoutedEventArgs e)
+        {
+            var dialog = new SaveFileDialog();
+            dialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    using (var fs = File.Create(dialog.FileName))
+                    {
+                        var serializer =
+                            new DataContractSerializer(typeof(StatSummaryViewModel));
+                        serializer.WriteObject(fs, ReportSummary.statSummary.ViewModel);
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
         }
     }
 }

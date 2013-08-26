@@ -8,7 +8,7 @@
     <Grid>
         <TabControl>
             <TabItem Header="Summary">
-                <querySessionSummaryControl:StatSummaryControl x:Name="statSummary"/>
+                <querySessionSummaryControl:StatSummaryControl x:Name="statSummary" x:FieldModifier="public"/>
             </TabItem>
             <TabItem Header="Individual Runtimes Graph">
                 <Grid>
