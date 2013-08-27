@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -10,27 +12,32 @@ namespace QuerySessionSummaryLib
     [DataContract]
     public class StatSummaryViewModel : INotifyPropertyChanged
     {
-        private List<TimeSpan> _runtimes;
         public StatSummaryViewModel() : this(string.Empty, new List<TimeSpan> {new TimeSpan(0)})
         {
         }
 
         public StatSummaryViewModel(string request, IEnumerable<TimeSpan> runtimes)
         {
+            Runtimes = new ObservableCollection<TimeSpan>(runtimes);
             Request = request;
+            Runtimes.CollectionChanged += RuntimesOnCollectionChanged;
             RecalculateProperties(runtimes);
+        }
+
+        private void RuntimesOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        {
+            OnPropertyChanged("Runtimes");
         }
 
         public void RecalculateProperties(IEnumerable<TimeSpan> runtimes)
         {
-            var timeSpans = runtimes as IList<TimeSpan> ?? runtimes.ToList();
-            _runtimes = timeSpans.ToList();
-            _runtimes.Sort();
-            Minimum = _runtimes.Min().TotalMilliseconds;
-            Maximum = _runtimes.Max().TotalMilliseconds;
-            Mean = _runtimes.Average(x => x.TotalMilliseconds);
-            Median = _runtimes[timeSpans.Count()/2].TotalMilliseconds;
-            TotalRuntime = _runtimes.Select(x => x.TotalMilliseconds).Sum();
+            var timeSpans = runtimes ?? new List<TimeSpan>();
+            Runtimes.OrderBy(x => x.TotalMilliseconds);
+            Minimum = Runtimes.Count > 0 ? Runtimes.Min().TotalMilliseconds : 0;
+            Maximum = Runtimes.Count > 0 ? Runtimes.Max().TotalMilliseconds : 0;
+            Mean = Runtimes.Count > 0 ? Runtimes.Average(x => x.TotalMilliseconds) : 0;
+            Median = Runtimes.Count > 0 ? Runtimes[timeSpans.Count()/2].TotalMilliseconds : 0;
+            TotalRuntime = Runtimes.Count > 0 ? Runtimes.Select(x => x.TotalMilliseconds).Sum() : 0;
         }
 
         private double _minimum;
@@ -124,16 +131,14 @@ namespace QuerySessionSummaryLib
         }
 
         [DataMember]
-        public List<TimeSpan> Runtimes
-        {
-            get { return _runtimes; }
-        }
+        public ObservableCollection<TimeSpan> Runtimes { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged(string propertyName)
         {
+            RecalculateProperties(Runtimes);
             var handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }

@@ -11,10 +11,14 @@ namespace QuerySessionSummaryControl
     public partial class StatSummaryControl : UserControl, INotifyPropertyChanged
     {
         private StatSummaryViewModel _viewModel;
-        public StatSummaryControl()
+        public StatSummaryControl() : this(new StatSummaryViewModel())
+        {
+        }
+
+        public StatSummaryControl(StatSummaryViewModel viewModel)
         {
             InitializeComponent();
-            ViewModel = new StatSummaryViewModel();
+            ViewModel = viewModel;
         }
 
         public StatSummaryViewModel ViewModel

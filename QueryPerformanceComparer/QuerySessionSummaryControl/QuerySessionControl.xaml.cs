@@ -57,7 +57,8 @@ namespace QuerySessionSummaryControl
             {
                 ReportSummary.MergeDataToChart(request, runtimes);
                 var newModelData = ReportSummary.StatSummary.ViewModel.Runtimes;
-                newModelData.AddRange(runtimes);
+                foreach (var item in runtimes)
+                    newModelData.Add(item);
                 ReportSummary.StatSummary.ViewModel = new StatSummaryViewModel(request, newModelData);
                 foreach (var item in runtimes)
                     ReportSummary.IndividualRuntime.ViewModel.Runtimes.Add(item.TotalMilliseconds);

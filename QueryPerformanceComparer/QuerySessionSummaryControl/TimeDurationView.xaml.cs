@@ -30,7 +30,7 @@ namespace QuerySessionSummaryControl
             if (timeDurationViewModel == null)
                 DataContext = new TimeDurationViewModel();
             (DataContext as TimeDurationViewModel).Queries.Clear();
-            var dialog = new OpenFileDialog {InitialDirectory = AppDomain.CurrentDomain.BaseDirectory};
+            var dialog = new OpenFileDialog { InitialDirectory = AppDomain.CurrentDomain.BaseDirectory };
             if (dialog.ShowDialog() != true) return;
             using (var fs = File.OpenRead(dialog.FileName))
             {
@@ -60,6 +60,11 @@ namespace QuerySessionSummaryControl
                     }
                 }
             }
+
+            //var vms = (from url in (DataContext as TimeDurationViewModel).Urls where (DataContext as TimeDurationViewModel).Summaries.All(x => x.Request != url) select new StatSummaryViewModel(url, new List<TimeSpan>())).ToList();
+            var vms = (DataContext as TimeDurationViewModel).Urls.ToList();
+            foreach (var item in vms)
+                (DataContext as TimeDurationViewModel).Summaries.Add(new StatSummaryViewModel(item, new List<TimeSpan>()));
         }
 
         private void RunTests_OnClick(object sender, RoutedEventArgs e)
@@ -84,6 +89,7 @@ namespace QuerySessionSummaryControl
             {
                 return;
             }
+
             var wrapper = new WebClientPerfWrapper();
             var sw = new Stopwatch();
             sw.Start();
@@ -99,8 +105,10 @@ namespace QuerySessionSummaryControl
                         {
                             if (sw.ElapsedMilliseconds >= time * 60 * 1000)
                                 break;
-                            string request = string.Format("{0}?{1}", url, query);
-                            wrapper.RunPerformanceRequest(request);
+                            var request = string.Format("{0}?{1}", url, query);
+                            var responseTime = wrapper.RunPerformanceRequest(request);
+                            var match = durationViewModel.Summaries.First(x => x.Request == url);
+                            durationViewModel.Summaries.First(x => x.Request == url).Runtimes.Add(responseTime);
                         }
                     }
                     else
