@@ -14,6 +14,7 @@
             <TextBox Width="40" x:Name="TestTime"></TextBox>
             <Button Click="RunTests_OnClick">Run Tests</Button>
             <Button Click="SerializeResults_OnClick">Serialize Results</Button>
+            <Button Click="SaveAsCSV_OnClick">Save As CSV</Button>
         </StackPanel>
         <TabControl Grid.Row="1">
             <TabItem Header="Parameter set">
