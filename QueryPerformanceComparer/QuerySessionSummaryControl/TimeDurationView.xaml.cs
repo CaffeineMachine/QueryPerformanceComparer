@@ -22,7 +22,7 @@ namespace QuerySessionSummaryControl
     {
         private IEnumerable<double> _resultRuntimes;
         private string _csvForm;
-        private Chart _cumulativeRuntimeChart;
+        private Chart _cumulativeRuntimeChart, _individualRuntimeChart;
         public TimeDurationView()
         {
             InitializeComponent();
@@ -39,6 +39,18 @@ namespace QuerySessionSummaryControl
             _cumulativeRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.Emboss;
             _cumulativeRuntimeChart.BorderlineColor = Color.Black;
             _cumulativeRuntimeChart.BorderlineWidth = 3;
+
+            _individualRuntimeChart = new Chart();
+            _individualRuntimeChart.ChartAreas.Add("chtArea");
+            IndividualGraphControlHost.Child = _individualRuntimeChart;
+            _individualRuntimeChart.ChartAreas[0].AxisX.Title = "Runs";
+            _individualRuntimeChart.ChartAreas[0].AxisX.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
+            _individualRuntimeChart.ChartAreas[0].AxisY.Title = "Runtime (Milliseconds)";
+            _individualRuntimeChart.ChartAreas[0].AxisY.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
+            _individualRuntimeChart.BackColor = Color.White;
+            _individualRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.Emboss;
+            _individualRuntimeChart.BorderlineColor = Color.Black;
+            _individualRuntimeChart.BorderlineWidth = 3;
         }
 
         private void LoadQueries_OnClick(object sender, RoutedEventArgs e)
@@ -88,6 +100,13 @@ namespace QuerySessionSummaryControl
             _cumulativeRuntimeChart.Legends.Clear();
             foreach (var url in durationViewModel.Urls)
             {
+                _individualRuntimeChart.Legends.Add(url);
+                _individualRuntimeChart.Series.Add(url);
+                _individualRuntimeChart.Series[index].ChartType = SeriesChartType.Line;
+                _individualRuntimeChart.Legends[index].LegendStyle = LegendStyle.Table;
+                _individualRuntimeChart.Legends[index].TableStyle = LegendTableStyle.Tall;
+                _individualRuntimeChart.Legends[index].Docking = Docking.Bottom;
+
                 _cumulativeRuntimeChart.Legends.Add(url);
                 _cumulativeRuntimeChart.Series.Add(url);
                 _cumulativeRuntimeChart.Series[index].ChartType = SeriesChartType.Line;
@@ -177,12 +196,20 @@ namespace QuerySessionSummaryControl
             index = 0;
             var max = durationViewModel.Summaries.Select(x => GetAggregate(x.Runtimes.ToList()).Max()).Max();
             var trialMax = durationViewModel.Summaries.Select(x => x.Runtimes.Count).Max();
+            var timespanMax = durationViewModel.Summaries.Select(x => x.Runtimes.Max()).Max().TotalMilliseconds;
+            var timespanMin = durationViewModel.Summaries.Select(x => x.Runtimes.Min()).Min().TotalMilliseconds;
             foreach (var url in urls)
             {
                 var timespans = durationViewModel.Summaries.First(x => x.Request == url).Runtimes.ToList();
                 var cumulativeMiliseconds = GetAggregate(timespans).ToList();
                 int trialNum = 0;
                 var trials = timespans.Select(item => ++trialNum).ToList();
+                _individualRuntimeChart.Series[index].Points.DataBindXY(trials, "Runs", timespans.Select(x => x.TotalMilliseconds).ToList(), "Runtime (Milliseconds)");
+                _individualRuntimeChart.ChartAreas[0].AxisY.Minimum = timespanMin;
+                _individualRuntimeChart.ChartAreas[0].AxisY.Maximum = timespanMax;
+                _individualRuntimeChart.ChartAreas[0].AxisX.Minimum = 0;
+                _individualRuntimeChart.ChartAreas[0].AxisX.Maximum = trials.Max();
+                
                 _cumulativeRuntimeChart.Series[index].Points.DataBindXY(trials, "Runs", cumulativeMiliseconds,
                                                                         "Runtime (Milliseconds)");
                 _cumulativeRuntimeChart.ChartAreas[0].AxisY.Minimum = 0;
@@ -235,6 +262,14 @@ namespace QuerySessionSummaryControl
         private void CumulativeDataLabels_OnChecked(object sender, RoutedEventArgs e)
         {
             foreach (var serie in _cumulativeRuntimeChart.Series)
+            {
+                serie.IsValueShownAsLabel = ShowCumulativeValues.IsChecked ?? false;
+            }
+        }
+
+        private void IndividualDataLabels_OnChecked(object sender, RoutedEventArgs e)
+        {
+            foreach (var serie in _individualRuntimeChart.Series)
             {
                 serie.IsValueShownAsLabel = ShowCumulativeValues.IsChecked ?? false;
             }

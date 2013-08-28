@@ -76,6 +76,14 @@
                     />
             </TabItem>
             <TabItem Header="Individual Runtimes">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <CheckBox Checked="IndividualDataLabels_OnChecked" Unchecked="IndividualDataLabels_OnChecked" Name="ShowIndividualValues">Show values on graph?</CheckBox>
+                    <WindowsFormsHost Grid.Row="1" Name="IndividualGraphControlHost" Grid.ColumnSpan="4"/>
+                </Grid>
             </TabItem>
             <TabItem Header="Cumulative Runtimes">
                 <Grid>
