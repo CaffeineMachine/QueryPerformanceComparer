@@ -119,7 +119,7 @@ namespace QuerySessionSummaryControl
                             var responseTime = wrapper.RunPerformanceRequest(request);
                             var match = durationViewModel.Summaries.First(x => x.Request == url);
                             durationViewModel.Summaries.First(x => x.Request == url).Runtimes.Add(responseTime);
-                            csvBuilder.Append(responseTime.TotalMilliseconds);
+                            csvBuilder.Append(string.Format("{0},", responseTime.TotalMilliseconds));
                         }
                         csvBuilder.AppendLine(string.Format("{0},", query));
                     }
