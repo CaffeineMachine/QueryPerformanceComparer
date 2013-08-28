@@ -165,15 +165,15 @@ namespace QuerySessionSummaryControl
             sw.Stop();
             _resultRuntimes = wrapper.GetResultRuntimes();
             _csvForm = csvBuilder.ToString();
-            DataTable dt = new DataTable();
-            string[] tableData = _csvForm.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            var col = from cl in tableData[0].Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
-                      select new DataColumn(cl);
-            dt.Columns.AddRange(col.ToArray());
-            (from st in tableData.Skip(1) 
-            select dt.Rows.Add(st.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries))).ToList();
-            gridView.ItemsSource = dt.DefaultView;
-            gridView.AutoGenerateColumns = true;
+            //DataTable dt = new DataTable();
+            //string[] tableData = _csvForm.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            //var col = from cl in tableData[0].Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
+            //          select new DataColumn(cl);
+            //dt.Columns.AddRange(col.ToArray());
+            //(from st in tableData.Skip(1) 
+            //select dt.Rows.Add(st.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries))).ToList();
+            //gridView.ItemsSource = dt.DefaultView;
+            //gridView.AutoGenerateColumns = true;
             index = 0;
             var max = durationViewModel.Summaries.Select(x => GetAggregate(x.Runtimes.ToList()).Max()).Max();
             var trialMax = durationViewModel.Summaries.Select(x => x.Runtimes.Count).Max();
