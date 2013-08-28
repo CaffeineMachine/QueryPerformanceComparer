@@ -118,8 +118,6 @@ namespace QuerySessionSummaryControl
                 _cumulativeRuntimeChart.Legends[index].LegendStyle = LegendStyle.Table;
                 _cumulativeRuntimeChart.Legends[index].TableStyle = LegendTableStyle.Tall;
                 _cumulativeRuntimeChart.Legends[index].Docking = Docking.Bottom;
-                _cumulativeRuntimeChart.ChartAreas[index].AxisY.Minimum = 0;
-                _cumulativeRuntimeChart.ChartAreas[index].AxisX.Minimum = 0;
                 index++;
             }
             csvBuilder.AppendLine("Query,");
@@ -160,6 +158,8 @@ namespace QuerySessionSummaryControl
             _resultRuntimes = wrapper.GetResultRuntimes();
             _csvForm = csvBuilder.ToString();
             index = 0;
+            var max = durationViewModel.Summaries.Select(x => GetAggregate(x.Runtimes.ToList()).Max()).Max();
+            var trialMax = durationViewModel.Summaries.Select(x => x.Runtimes.Count).Max();
             foreach (var url in urls)
             {
                 var timespans = durationViewModel.Summaries.First(x => x.Request == url).Runtimes.ToList();
@@ -168,8 +168,10 @@ namespace QuerySessionSummaryControl
                 var trials = timespans.Select(item => ++trialNum).ToList();
                 _cumulativeRuntimeChart.Series[index].Points.DataBindXY(trials, "Runs", cumulativeMiliseconds,
                                                                         "Runtime (Milliseconds)");
-                _cumulativeRuntimeChart.ChartAreas[index].AxisY.Maximum = cumulativeMiliseconds.Max();
-                _cumulativeRuntimeChart.ChartAreas[index].AxisX.Maximum = trials.Max();
+                _cumulativeRuntimeChart.ChartAreas[0].AxisY.Minimum = 0;
+                _cumulativeRuntimeChart.ChartAreas[0].AxisX.Minimum = 0;
+                _cumulativeRuntimeChart.ChartAreas[0].AxisY.Maximum = max;
+                _cumulativeRuntimeChart.ChartAreas[0].AxisX.Maximum = trialMax;
                 index++;
             }
         }
