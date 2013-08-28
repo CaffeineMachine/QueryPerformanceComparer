@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Windows;
+using System.Windows.Forms.DataVisualization.Charting;
 using Microsoft.Win32;
 using QuerySessionSummaryLib;
 using WebClientPerfLib;
@@ -19,11 +21,23 @@ namespace QuerySessionSummaryControl
     {
         private IEnumerable<double> _resultRuntimes;
         private string _csvForm;
+        private Chart _cumulativeRuntimeChart;
         public TimeDurationView()
         {
             InitializeComponent();
             DataContext = new TimeDurationViewModel();
             _resultRuntimes = new List<double>();
+            _cumulativeRuntimeChart = new Chart();
+            _cumulativeRuntimeChart.ChartAreas.Add("chtArea");
+            CumulativeGraphControlHost.Child = _cumulativeRuntimeChart;
+            _cumulativeRuntimeChart.ChartAreas[0].AxisX.Title = "Runs";
+            _cumulativeRuntimeChart.ChartAreas[0].AxisX.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
+            _cumulativeRuntimeChart.ChartAreas[0].AxisY.Title = "Runtime (Milliseconds)";
+            _cumulativeRuntimeChart.ChartAreas[0].AxisY.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
+            _cumulativeRuntimeChart.BackColor = Color.White;
+            _cumulativeRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.Emboss;
+            _cumulativeRuntimeChart.BorderlineColor = Color.Black;
+            _cumulativeRuntimeChart.BorderlineWidth = 3;
         }
 
         private void LoadQueries_OnClick(object sender, RoutedEventArgs e)
@@ -94,11 +108,23 @@ namespace QuerySessionSummaryControl
                 return;
             }
 
+            int index = 0;
             foreach (var url in urls)
             {
                 csvBuilder.Append(url + ",");
+                _cumulativeRuntimeChart.Legends.Add(url);
+                _cumulativeRuntimeChart.Series.Add(url);
+                _cumulativeRuntimeChart.Series[index].ChartType = SeriesChartType.Line;
+                _cumulativeRuntimeChart.Legends[index].LegendStyle = LegendStyle.Table;
+                _cumulativeRuntimeChart.Legends[index].TableStyle = LegendTableStyle.Tall;
+                _cumulativeRuntimeChart.Legends[index].Docking = Docking.Bottom;
+                _cumulativeRuntimeChart.ChartAreas[index].AxisY.Minimum = 0;
+                _cumulativeRuntimeChart.ChartAreas[index].AxisX.Minimum = 0;
+                index++;
             }
             csvBuilder.AppendLine("Query,");
+
+            
 
             var wrapper = new WebClientPerfWrapper();
             var sw = new Stopwatch();
@@ -129,11 +155,37 @@ namespace QuerySessionSummaryControl
                         return;
                     }
                 }
-
             }
             sw.Stop();
             _resultRuntimes = wrapper.GetResultRuntimes();
             _csvForm = csvBuilder.ToString();
+            index = 0;
+            foreach (var url in urls)
+            {
+                var timespans = durationViewModel.Summaries.First(x => x.Request == url).Runtimes.ToList();
+                var cumulativeMiliseconds = GetAggregate(timespans).ToList();
+                int trialNum = 0;
+                var trials = timespans.Select(item => ++trialNum).ToList();
+                _cumulativeRuntimeChart.Series[index].Points.DataBindXY(trials, "Runs", cumulativeMiliseconds,
+                                                                        "Runtime (Milliseconds)");
+                _cumulativeRuntimeChart.ChartAreas[index].AxisY.Maximum = cumulativeMiliseconds.Max();
+                _cumulativeRuntimeChart.ChartAreas[index].AxisX.Maximum = trials.Max();
+                index++;
+            }
+        }
+
+        private IEnumerable<double> GetAggregate(List<TimeSpan> runtimes)
+        {
+            var aggregates = new List<double>();
+            var index = 1;
+#pragma warning disable 168
+            foreach (var item in runtimes)
+#pragma warning restore 168
+            {
+                aggregates.Add(runtimes.Take(index).Sum(x => x.TotalMilliseconds));
+                index++;
+            }
+            return aggregates;
         }
 
         private void SerializeResults_OnClick(object sender, RoutedEventArgs e)
@@ -159,6 +211,11 @@ namespace QuerySessionSummaryControl
                     sw.Write(_csvForm);
                 }
             }
+        }
+
+        private void CumulativeDataLabels_OnChecked(object sender, RoutedEventArgs e)
+        {
+            
         }
     }
 }

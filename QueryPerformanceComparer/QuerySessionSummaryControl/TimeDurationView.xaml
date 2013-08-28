@@ -78,6 +78,14 @@
             <TabItem Header="Individual Runtimes">
             </TabItem>
             <TabItem Header="Cumulative Runtimes">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <CheckBox Checked="CumulativeDataLabels_OnChecked" Unchecked="CumulativeDataLabels_OnChecked" Name="ShowCumulativeValues">Show values on graph?</CheckBox>
+                    <WindowsFormsHost Grid.Row="1" Name="CumulativeGraphControlHost" Grid.ColumnSpan="4"/>
+                </Grid>
             </TabItem>
             <TabItem Header="Runtime Values">
 
