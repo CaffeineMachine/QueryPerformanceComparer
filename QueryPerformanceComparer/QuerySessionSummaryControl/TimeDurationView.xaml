@@ -108,12 +108,14 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Label Grid.Row="0" Grid.Column="0">Number of threads per second:</Label>
                     <TextBox Grid.Row="0" Grid.Column="1" Width="40" x:Name="loadTestThreads"></TextBox>
                     <Label Grid.Row="1" Grid.Column="0">Number of minutes to execute:</Label>
                     <TextBox Grid.Row="1" Grid.Column="1" Width="40" x:Name="loadTestTime"></TextBox>
+                    <Button Grid.Row="2" Grid.Column="1" Click="LoadTests_OnClick">Run load tests</Button>
                 </Grid>
             </TabItem>
         </TabControl>
