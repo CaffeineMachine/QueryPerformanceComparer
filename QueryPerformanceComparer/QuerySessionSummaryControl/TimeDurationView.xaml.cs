@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Forms.DataVisualization.Charting;
 using Microsoft.Win32;
@@ -23,6 +24,7 @@ namespace QuerySessionSummaryControl
         private IEnumerable<double> _resultRuntimes;
         private string _csvForm;
         private Chart _cumulativeRuntimeChart, _individualRuntimeChart;
+
         public TimeDurationView()
         {
             InitializeComponent();
@@ -32,9 +34,11 @@ namespace QuerySessionSummaryControl
             _cumulativeRuntimeChart.ChartAreas.Add("chtArea");
             CumulativeGraphControlHost.Child = _cumulativeRuntimeChart;
             _cumulativeRuntimeChart.ChartAreas[0].AxisX.Title = "Runs";
-            _cumulativeRuntimeChart.ChartAreas[0].AxisX.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
+            _cumulativeRuntimeChart.ChartAreas[0].AxisX.TitleFont = new Font(
+                System.Drawing.FontFamily.GenericSansSerif, 12);
             _cumulativeRuntimeChart.ChartAreas[0].AxisY.Title = "Runtime (Milliseconds)";
-            _cumulativeRuntimeChart.ChartAreas[0].AxisY.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
+            _cumulativeRuntimeChart.ChartAreas[0].AxisY.TitleFont = new Font(
+                System.Drawing.FontFamily.GenericSansSerif, 12);
             _cumulativeRuntimeChart.BackColor = Color.White;
             _cumulativeRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.Emboss;
             _cumulativeRuntimeChart.BorderlineColor = Color.Black;
@@ -44,9 +48,11 @@ namespace QuerySessionSummaryControl
             _individualRuntimeChart.ChartAreas.Add("chtArea");
             IndividualGraphControlHost.Child = _individualRuntimeChart;
             _individualRuntimeChart.ChartAreas[0].AxisX.Title = "Runs";
-            _individualRuntimeChart.ChartAreas[0].AxisX.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
+            _individualRuntimeChart.ChartAreas[0].AxisX.TitleFont = new Font(
+                System.Drawing.FontFamily.GenericSansSerif, 12);
             _individualRuntimeChart.ChartAreas[0].AxisY.Title = "Runtime (Milliseconds)";
-            _individualRuntimeChart.ChartAreas[0].AxisY.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
+            _individualRuntimeChart.ChartAreas[0].AxisY.TitleFont = new Font(
+                System.Drawing.FontFamily.GenericSansSerif, 12);
             _individualRuntimeChart.BackColor = Color.White;
             _individualRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.Emboss;
             _individualRuntimeChart.BorderlineColor = Color.Black;
@@ -149,7 +155,7 @@ namespace QuerySessionSummaryControl
             }
             csvBuilder.AppendLine("Query,");
 
-            
+
 
             var wrapper = new WebClientPerfWrapper();
             var sw = new Stopwatch();
@@ -204,12 +210,14 @@ namespace QuerySessionSummaryControl
                 var cumulativeMiliseconds = GetAggregate(timespans).ToList();
                 int trialNum = 0;
                 var trials = timespans.Select(item => ++trialNum).ToList();
-                _individualRuntimeChart.Series[index].Points.DataBindXY(trials, "Runs", timespans.Select(x => x.TotalMilliseconds).ToList(), "Runtime (Milliseconds)");
+                _individualRuntimeChart.Series[index].Points.DataBindXY(trials, "Runs",
+                                                                        timespans.Select(x => x.TotalMilliseconds)
+                                                                                 .ToList(), "Runtime (Milliseconds)");
                 _individualRuntimeChart.ChartAreas[0].AxisY.Minimum = timespanMin;
                 _individualRuntimeChart.ChartAreas[0].AxisY.Maximum = timespanMax;
                 _individualRuntimeChart.ChartAreas[0].AxisX.Minimum = 0;
                 _individualRuntimeChart.ChartAreas[0].AxisX.Maximum = trials.Max();
-                
+
                 _cumulativeRuntimeChart.Series[index].Points.DataBindXY(trials, "Runs", cumulativeMiliseconds,
                                                                         "Runtime (Milliseconds)");
                 _cumulativeRuntimeChart.ChartAreas[0].AxisY.Minimum = 0;
@@ -248,7 +256,12 @@ namespace QuerySessionSummaryControl
 
         private void SaveAsCSV_OnClick(object sender, RoutedEventArgs e)
         {
-            var dialog = new SaveFileDialog { InitialDirectory = AppDomain.CurrentDomain.BaseDirectory, Filter = "CSV (Comma delimited) |*.csv", DefaultExt = ".csv"};
+            var dialog = new SaveFileDialog
+                             {
+                                 InitialDirectory = AppDomain.CurrentDomain.BaseDirectory,
+                                 Filter = "CSV (Comma delimited) |*.csv",
+                                 DefaultExt = ".csv"
+                             };
             if (dialog.ShowDialog() != true) return;
             using (var fs = File.Create(dialog.FileName))
             {
@@ -272,6 +285,71 @@ namespace QuerySessionSummaryControl
             foreach (var serie in _individualRuntimeChart.Series)
             {
                 serie.IsValueShownAsLabel = ShowCumulativeValues.IsChecked ?? false;
+            }
+        }
+
+        private void LoadTests_OnClick(object sender, RoutedEventArgs e)
+        {
+            int time = 0, threads = 0;
+            bool loadTestTimeParsed = Int32.TryParse(loadTestTime.Text, out time);
+            if (!loadTestTimeParsed)
+            {
+                MessageBox.Show("Error parsing load test time. Stopping tests.");
+                return;
+            }
+
+            bool loadTestThreadsParsed = Int32.TryParse(loadTestThreads.Text, out threads);
+            if (!loadTestThreadsParsed)
+            {
+                MessageBox.Show("Error parsing load test threads. Stopping tests.");
+                return;
+            }
+
+            var durationViewModel = DataContext as TimeDurationViewModel;
+            if (durationViewModel == null)
+            {
+                MessageBox.Show("ViewModel null, Aborting tests");
+                return;
+            }
+
+            var queries = durationViewModel.Queries;
+            var urls = durationViewModel.Urls;
+            if (!queries.Any())
+            {
+                MessageBox.Show("No queries loaded. Aborting tests");
+                return;
+            }
+
+            Stopwatch sw = Stopwatch.StartNew();
+            var wrapper = new WebClientPerfWrapper();
+            while (sw.ElapsedMilliseconds < time * 60 * 1000)
+            {
+                foreach (var query in queries)
+                {
+                    if (sw.ElapsedMilliseconds >= time * 60 * 1000)
+                        break;
+                    if (urls.Any())
+                    {
+                        var requests = urls.Select(x => string.Format("{0}?{1}", x, query)).ToList();
+                        for (int i = 0; sw.ElapsedMilliseconds < time*60*1000; i++)
+                        {
+                            if (sw.ElapsedMilliseconds >= time*60*1000)
+                                break;
+                            for (int j = 0; j < threads; j++)
+                            {
+                                var thread = new Thread(() => wrapper.RunPerformanceRequest(requests[(i + j)%requests.Count]));
+                                thread.Start();
+                            }
+                            Thread.Sleep(1000);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("No urls loaded. Aborting tests");
+                        return;
+                    }
+                }
+
             }
         }
     }

@@ -98,6 +98,24 @@
             <TabItem Header="Runtime Values">
                 <DataGrid x:Name="gridView" ColumnWidth="*" />
             </TabItem>
+            <TabItem Header="Load Test">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0">Number of threads per second:</Label>
+                    <TextBox Grid.Row="0" Grid.Column="1" Width="40" x:Name="loadTestThreads"></TextBox>
+                    <Label Grid.Row="1" Grid.Column="0">Number of minutes to execute:</Label>
+                    <TextBox Grid.Row="1" Grid.Column="1" Width="40" x:Name="loadTestTime"></TextBox>
+                </Grid>
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>
