@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -81,6 +82,20 @@ namespace QuerySessionSummaryControl
             var vms = (DataContext as TimeDurationViewModel).Urls.ToList();
             foreach (var item in vms)
                 (DataContext as TimeDurationViewModel).Summaries.Add(new StatSummaryViewModel(item, new List<TimeSpan>()));
+
+            var index = 0;
+            _cumulativeRuntimeChart.Series.Clear();
+            _cumulativeRuntimeChart.Legends.Clear();
+            foreach (var url in durationViewModel.Urls)
+            {
+                _cumulativeRuntimeChart.Legends.Add(url);
+                _cumulativeRuntimeChart.Series.Add(url);
+                _cumulativeRuntimeChart.Series[index].ChartType = SeriesChartType.Line;
+                _cumulativeRuntimeChart.Legends[index].LegendStyle = LegendStyle.Table;
+                _cumulativeRuntimeChart.Legends[index].TableStyle = LegendTableStyle.Tall;
+                _cumulativeRuntimeChart.Legends[index].Docking = Docking.Bottom;
+                index++;
+            }
         }
 
         private void RunTests_OnClick(object sender, RoutedEventArgs e)
@@ -112,13 +127,6 @@ namespace QuerySessionSummaryControl
             foreach (var url in urls)
             {
                 csvBuilder.Append(url + ",");
-                _cumulativeRuntimeChart.Legends.Add(url);
-                _cumulativeRuntimeChart.Series.Add(url);
-                _cumulativeRuntimeChart.Series[index].ChartType = SeriesChartType.Line;
-                _cumulativeRuntimeChart.Legends[index].LegendStyle = LegendStyle.Table;
-                _cumulativeRuntimeChart.Legends[index].TableStyle = LegendTableStyle.Tall;
-                _cumulativeRuntimeChart.Legends[index].Docking = Docking.Bottom;
-                index++;
             }
             csvBuilder.AppendLine("Query,");
 
@@ -157,6 +165,15 @@ namespace QuerySessionSummaryControl
             sw.Stop();
             _resultRuntimes = wrapper.GetResultRuntimes();
             _csvForm = csvBuilder.ToString();
+            DataTable dt = new DataTable();
+            string[] tableData = _csvForm.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            var col = from cl in tableData[0].Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
+                      select new DataColumn(cl);
+            dt.Columns.AddRange(col.ToArray());
+            (from st in tableData.Skip(1) 
+            select dt.Rows.Add(st.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries))).ToList();
+            gridView.ItemsSource = dt.DefaultView;
+            gridView.AutoGenerateColumns = true;
             index = 0;
             var max = durationViewModel.Summaries.Select(x => GetAggregate(x.Runtimes.ToList()).Max()).Max();
             var trialMax = durationViewModel.Summaries.Select(x => x.Runtimes.Count).Max();
@@ -217,7 +234,10 @@ namespace QuerySessionSummaryControl
 
         private void CumulativeDataLabels_OnChecked(object sender, RoutedEventArgs e)
         {
-            
+            foreach (var serie in _cumulativeRuntimeChart.Series)
+            {
+                serie.IsValueShownAsLabel = ShowCumulativeValues.IsChecked ?? false;
+            }
         }
     }
 }
