@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -288,6 +289,7 @@ namespace QuerySessionSummaryControl
             }
         }
 
+        private ConcurrentQueue<Tuple<string, TimeSpan>> _concurrentRuntimes = new ConcurrentQueue<Tuple<string, TimeSpan>>();
         private void LoadTests_OnClick(object sender, RoutedEventArgs e)
         {
             int time = 0, threads = 0;
@@ -324,22 +326,32 @@ namespace QuerySessionSummaryControl
             var wrapper = new WebClientPerfWrapper();
             while (sw.ElapsedMilliseconds < time * 60 * 1000)
             {
+                int index = 0;
                 foreach (var query in queries)
                 {
                     if (sw.ElapsedMilliseconds >= time * 60 * 1000)
                         break;
+
                     if (urls.Any())
                     {
+                        // Build one request for each url.
                         var requests = urls.Select(x => string.Format("{0}?{1}", x, query)).ToList();
-                        for (int i = 0; sw.ElapsedMilliseconds < time*60*1000; i++)
+                        if (sw.ElapsedMilliseconds >= time * 60 * 1000)
+                            break;
+                        foreach (var req in requests)
                         {
-                            if (sw.ElapsedMilliseconds >= time*60*1000)
-                                break;
-                            for (int j = 0; j < threads; j++)
-                            {
-                                var thread = new Thread(() => wrapper.RunPerformanceRequest(requests[(i + j)%requests.Count]));
-                                thread.Start();
-                            }
+                            var thread = new Thread(() =>
+                                                        {
+                                                            var runtime = wrapper.RunPerformanceRequest(
+                                                                req);
+                                                            _concurrentRuntimes.Enqueue(new Tuple<string, TimeSpan>(req, runtime));
+                                                        });
+                            thread.Start();
+                        }
+
+                        index++;
+                        if (index%threads == 0)
+                        {
                             Thread.Sleep(1000);
                         }
                     }
@@ -349,8 +361,35 @@ namespace QuerySessionSummaryControl
                         return;
                     }
                 }
-
             }
+
+            var csvValue = BuildLoadTimesCsv();
+
+            var dialog = new SaveFileDialog
+            {
+                InitialDirectory = AppDomain.CurrentDomain.BaseDirectory,
+                Filter = "CSV (Comma delimited) |*.csv",
+                DefaultExt = ".csv"
+            };
+            if (dialog.ShowDialog() != true) return;
+            using (var fs = File.Create(dialog.FileName))
+            {
+                using (var writer = new StreamWriter(fs))
+                {
+                    writer.Write(csvValue);
+                }
+            }
+        }
+
+        private string BuildLoadTimesCsv()
+        {
+            var sb = new StringBuilder();
+            foreach (var tuple in _concurrentRuntimes)
+            {
+                sb.AppendLine(string.Format("{0},{1},", tuple.Item1, tuple.Item2.TotalMilliseconds));
+            }
+
+            return sb.ToString();
         }
     }
 }
