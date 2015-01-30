@@ -49,14 +49,14 @@ namespace QuerySessionSummaryControl
 
             if (!_requests.Contains(request))
             {
-                ReportSummary.AddDataToChart(request, results.Select(x => x.Item1).ToList());
+                ReportSummary.AddDataToChart(request, results.Select(x => x.Item1).ToList(), results.Select(x => x.Item1).ToList());
                 ReportSummary.StatSummary.ViewModel = new StatSummaryViewModel(request, results.Select(x => x.Item1).ToList());
                 ReportSummary.IndividualRuntime.ViewModel = new IndividualRuntimeViewModel(results.Select( x=> x.Item1).ToList());
                 _requests.Add(request);
             }
             else
             {
-                ReportSummary.MergeDataToChart(request, results.Select(x => x.Item1).ToList());
+                ReportSummary.MergeDataToChart(request, results.Select(x => x.Item1).ToList(), results.Select(x => x.Item1).ToList());
                 var newModelData = ReportSummary.StatSummary.ViewModel.Runtimes;
                 foreach (var item in results.Select(x => x.Item1).ToList())
                     newModelData.Add(item);

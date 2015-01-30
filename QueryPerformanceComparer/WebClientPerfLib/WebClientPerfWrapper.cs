@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace WebClientPerfLib
 {
@@ -15,8 +17,10 @@ namespace WebClientPerfLib
             Tuple<TimeSpan, string> result;
             TimeSpan elapsed;
             var req = WebRequest.Create(uri);
+            req.Timeout = 1800000;
+            req.Proxy = WebProxy.GetDefaultProxy();
             string responseDoc;
-            req.Proxy = null;
+            //req.Proxy = null;
             var sw = new Stopwatch();
             sw.Start();
             using (var res = req.GetResponse())
@@ -33,6 +37,11 @@ namespace WebClientPerfLib
                 sw.Reset();
             }
             return result;
+        }
+
+        public async Task<Tuple<TimeSpan, string>> RunPerformanceRequestTask(string uri)
+        {
+            return await Task.Run(() => RunPerformanceRequest(uri));
         }
 
         public IEnumerable<double> GetResultRuntimes()

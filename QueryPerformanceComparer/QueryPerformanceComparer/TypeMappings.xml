@@ -1,3 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?> 
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <module name="typeMapping">
+  <bind service="QueryPerformance.Interfaces.IPlugin, QueryPerformance.Interfaces" to="BillProcessorServicePlugin.BillProcessorServicePlugin, BillProcessorServicePlugin"/>
 </module>

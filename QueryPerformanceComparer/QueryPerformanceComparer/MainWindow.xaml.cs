@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Ninject;
+using QueryPerformance.Interfaces;
 using QuerySessionSummaryControl;
 
 namespace QueryPerformanceComparer
@@ -22,6 +24,8 @@ namespace QueryPerformanceComparer
             LoadAllBinDirectoryAssemblies();
             if (File.Exists("TypeMappings.xml"))
                 _kernel.Load("TypeMappings.xml");
+            var plugins = _kernel.GetAll<IPlugin>().ToList();
+            PluginsListView.ItemsSource = plugins;
         }
 
         private void Quit_OnClick(object sender, RoutedEventArgs e)
@@ -81,6 +85,14 @@ namespace QueryPerformanceComparer
             // Create a render bitmap and push the surface to it
             this.UpdateLayout();
             new PrintDialog().PrintVisual(this, "Report");
+        }
+
+        private void RunModule_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (PluginsListView.SelectedItem != null && PluginsListView.SelectedItem is IPlugin)
+            {
+                (PluginsListView.SelectedItem as IPlugin).Run(GridPanel);
+            }
         }
     }
 }

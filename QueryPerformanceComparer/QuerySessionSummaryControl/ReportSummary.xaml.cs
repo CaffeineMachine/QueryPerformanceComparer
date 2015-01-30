@@ -18,6 +18,7 @@ namespace QuerySessionSummaryControl
         public ReportSummary()
         {
             InitializeComponent();
+            _index = 0;
             _individualRuntimeChart = new Chart();
             _cumulativeRuntimeChart = new Chart();
         }
@@ -56,7 +57,7 @@ namespace QuerySessionSummaryControl
         }
 
         private int _index;
-        public void AddDataToChart(string request, List<TimeSpan> runtimes)
+        public void AddDataToChart(string request, List<TimeSpan> runtimes, List<TimeSpan> aggregateRuntimes)
         {
             _individualRuntimeChart.Legends.Add(request);
             _individualRuntimeChart.Series.Add(request);
@@ -68,10 +69,10 @@ namespace QuerySessionSummaryControl
             _individualRuntimeChart.Legends[_index].LegendStyle = LegendStyle.Table;
             _individualRuntimeChart.Legends[_index].TableStyle = LegendTableStyle.Tall;
             _individualRuntimeChart.Legends[_index].Docking = Docking.Bottom;
-            _individualRuntimeChart.ChartAreas[_index].AxisY.Minimum = runtimes.Min().TotalMilliseconds;
-            _individualRuntimeChart.ChartAreas[_index].AxisY.Maximum = runtimes.Max().TotalMilliseconds;
-            _individualRuntimeChart.ChartAreas[_index].AxisX.Minimum = trials.Min();
-            _individualRuntimeChart.ChartAreas[_index].AxisX.Maximum = trials.Max();
+            _individualRuntimeChart.ChartAreas[0].AxisY.Minimum = aggregateRuntimes.Min().TotalMilliseconds;
+            _individualRuntimeChart.ChartAreas[0].AxisY.Maximum = aggregateRuntimes.Max().TotalMilliseconds;
+            _individualRuntimeChart.ChartAreas[0].AxisX.Minimum = trials.Min();
+            _individualRuntimeChart.ChartAreas[0].AxisX.Maximum = trials.Max();
 
             _cumulativeRuntimeChart.Legends.Add(request);
             _cumulativeRuntimeChart.Series.Add(request);
@@ -81,10 +82,10 @@ namespace QuerySessionSummaryControl
             _cumulativeRuntimeChart.Legends[_index].LegendStyle = LegendStyle.Table;
             _cumulativeRuntimeChart.Legends[_index].TableStyle = LegendTableStyle.Tall;
             _cumulativeRuntimeChart.Legends[_index].Docking = Docking.Bottom;
-            _cumulativeRuntimeChart.ChartAreas[_index].AxisY.Minimum = 0;
-            _cumulativeRuntimeChart.ChartAreas[_index].AxisY.Maximum = cumulativeMiliseconds.Max();
-            _cumulativeRuntimeChart.ChartAreas[_index].AxisX.Minimum = 0;
-            _cumulativeRuntimeChart.ChartAreas[_index].AxisX.Maximum = trials.Max();
+            _cumulativeRuntimeChart.ChartAreas[0].AxisY.Minimum = 0;
+            _cumulativeRuntimeChart.ChartAreas[0].AxisY.Maximum = cumulativeMiliseconds.Max();
+            _cumulativeRuntimeChart.ChartAreas[0].AxisX.Minimum = 0;
+            _cumulativeRuntimeChart.ChartAreas[0].AxisX.Maximum = trials.Max();
 
             _index++;
         }
@@ -103,7 +104,7 @@ namespace QuerySessionSummaryControl
             return aggregates;
         }
 
-        public void MergeDataToChart(string request, List<TimeSpan> runtimes)
+        public void MergeDataToChart(string request, List<TimeSpan> runtimes, List<TimeSpan> aggregateRuntimes)
         {
             var index = _individualRuntimeChart.Series.IndexOf(request);
             var milliseconds = _individualRuntimeChart.Series[index].Points.Select(x => x.YValues.First()).ToList();

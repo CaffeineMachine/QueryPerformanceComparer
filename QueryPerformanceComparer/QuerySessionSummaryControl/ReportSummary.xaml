@@ -29,7 +29,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Individual Runtimes Grid">
-                <querySessionSummaryControl:IndividualRuntimeControl x:Name="IndividualRuntime"/>
+                <querySessionSummaryControl:IndividualRuntimeControl x:Name="IndividualRuntime" x:FieldModifier="public"/>
             </TabItem>
         </TabControl>
     </Grid>
