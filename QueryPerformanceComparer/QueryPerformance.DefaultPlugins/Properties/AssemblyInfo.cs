@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("BillProcessorServicePlugin")]
+[assembly: AssemblyTitle("QueryPerformance.DefaultPlugins")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("State of Texas")]
-[assembly: AssemblyProduct("BillProcessorServicePlugin")]
+[assembly: AssemblyProduct("QueryPerformance.DefaultPlugins")]
 [assembly: AssemblyCopyright("Copyright © State of Texas 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("e5321437-ddeb-4d42-ada2-d1a42b74c15c")]
+[assembly: Guid("f5ef48ac-6bf4-4e79-a891-918706e62f04")]
 
 // Version information for an assembly consists of the following four values:
 //

@@ -113,9 +113,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BillProcessorServicePlugin\BillProcessorServicePlugin.csproj">
-      <Project>{bc6a5ac8-bcbc-4eb0-aa07-df7ae4d47f31}</Project>
-      <Name>BillProcessorServicePlugin</Name>
+    <ProjectReference Include="..\QueryPerformance.DefaultPlugins\QueryPerformance.DefaultPlugins.csproj">
+      <Project>{c8513865-fdfe-44bb-b579-5ff0de488643}</Project>
+      <Name>QueryPerformance.DefaultPlugins</Name>
     </ProjectReference>
     <ProjectReference Include="..\QueryPerformance.Interfaces\QueryPerformance.Interfaces.csproj">
       <Project>{69942088-5E4C-4A39-81B0-CFA17104C073}</Project>

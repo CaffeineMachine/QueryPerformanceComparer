@@ -38,6 +38,19 @@ namespace QuerySessionSummaryLib
             Mean = Runtimes.Count > 0 ? Runtimes.Average(x => x.TotalMilliseconds) : 0;
             Median = Runtimes.Count > 0 ? Runtimes[timeSpans.Count()/2].TotalMilliseconds : 0;
             TotalRuntime = Runtimes.Count > 0 ? Runtimes.Select(x => x.TotalMilliseconds).Sum() : 0;
+            CalculateStdDev();
+        }
+
+        private void CalculateStdDev()
+        {
+            var varianceDifferences = new List<double>();
+            foreach (var runtime in Runtimes)
+            {
+                var variance = runtime.TotalMilliseconds - Mean;
+                var varianceSquared = Math.Pow(variance, 2);
+                varianceDifferences.Add(varianceSquared);
+            }
+            StdDev = Math.Sqrt(varianceDifferences.Sum()/Runtimes.Count);
         }
 
         private double _minimum;
@@ -126,6 +139,22 @@ namespace QuerySessionSummaryLib
                 {
                     _request = value;
                     OnPropertyChanged("Request");
+                }
+            }
+        }
+
+        private double _stdDev;
+
+        [DataMember]
+        public double StdDev
+        {
+            get {  return _stdDev;}
+            set
+            {
+                if (_stdDev != value)
+                {
+                    _stdDev = value;
+                    OnPropertyChanged("StdDev");
                 }
             }
         }

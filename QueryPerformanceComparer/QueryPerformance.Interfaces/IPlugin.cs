@@ -6,6 +6,5 @@ namespace QueryPerformance.Interfaces
     {
         UserControl Control { get; }
         string DisplayName { get; }
-        void Run(Grid hostPanel);
     }
 }

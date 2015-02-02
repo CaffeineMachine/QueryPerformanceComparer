@@ -42,9 +42,7 @@ namespace QuerySessionSummaryControl
             _cumulativeRuntimeChart.ChartAreas[0].AxisY.TitleFont = new Font(
                 System.Drawing.FontFamily.GenericSansSerif, 12);
             _cumulativeRuntimeChart.BackColor = Color.White;
-            _cumulativeRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.Emboss;
-            _cumulativeRuntimeChart.BorderlineColor = Color.Black;
-            _cumulativeRuntimeChart.BorderlineWidth = 3;
+            _cumulativeRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.None;
 
             _individualRuntimeChart = new Chart();
             _individualRuntimeChart.ChartAreas.Add("chtArea");
@@ -56,9 +54,7 @@ namespace QuerySessionSummaryControl
             _individualRuntimeChart.ChartAreas[0].AxisY.TitleFont = new Font(
                 System.Drawing.FontFamily.GenericSansSerif, 12);
             _individualRuntimeChart.BackColor = Color.White;
-            _individualRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.Emboss;
-            _individualRuntimeChart.BorderlineColor = Color.Black;
-            _individualRuntimeChart.BorderlineWidth = 3;
+            _individualRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.None;
         }
 
         private void LoadQueries_OnClick(object sender, RoutedEventArgs e)

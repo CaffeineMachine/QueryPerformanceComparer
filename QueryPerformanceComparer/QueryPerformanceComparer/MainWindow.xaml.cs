@@ -4,27 +4,24 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using Ninject;
 using QueryPerformance.Interfaces;
-using QuerySessionSummaryControl;
 
 namespace QueryPerformanceComparer
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
-        private readonly IKernel _kernel;
         public MainWindow()
         {
             InitializeComponent();
-            _kernel = new StandardKernel();
+            IKernel kernel = new StandardKernel();
             LoadAllBinDirectoryAssemblies();
             if (File.Exists("TypeMappings.xml"))
-                _kernel.Load("TypeMappings.xml");
-            var plugins = _kernel.GetAll<IPlugin>().ToList();
+                kernel.Load("TypeMappings.xml");
+            var plugins = kernel.GetAll<IPlugin>().ToList();
             PluginsListView.ItemsSource = plugins;
         }
 
@@ -33,7 +30,7 @@ namespace QueryPerformanceComparer
             Application.Current.Shutdown();
         }
 
-        public void LoadAllBinDirectoryAssemblies()
+        private void LoadAllBinDirectoryAssemblies()
         {
             var binPath = AppDomain.CurrentDomain.BaseDirectory; // note: don't use CurrentEntryAssembly or anything like that.
 
@@ -51,21 +48,6 @@ namespace QueryPerformanceComparer
             } // foreach dll
         }
 
-        private void DurationTest_Click(object sender, RoutedEventArgs e)
-        {
-            GridPanel.Children.Clear();
-            GridPanel.ColumnDefinitions.Clear();
-            var timeDurationView = new TimeDurationView();
-            GridPanel.Children.Add(timeDurationView);
-        }
-
-        private void QuantityTest_Click(object sender, RoutedEventArgs e)
-        {
-            GridPanel.Children.Clear();
-            var sessionControl = new QuerySessionControl();
-            GridPanel.Children.Add(sessionControl);
-        }
-
         private void ReturnToMenu_OnClick(object sender, RoutedEventArgs e)
         {
             GridPanel.Children.Clear();
@@ -74,25 +56,29 @@ namespace QueryPerformanceComparer
 
         private void PrintItem_OnClick(object sender, RoutedEventArgs e)
         {
-            Transform transform = this.LayoutTransform;
             // reset current transform (in case it is scaled or rotated)
-            this.LayoutTransform = null;
+            LayoutTransform = null;
 
-            Size size = new Size(this.ActualWidth, this.ActualHeight);
-            this.Measure(size);
-            this.Arrange(new Rect(size));
+            var size = new Size(ActualWidth, ActualHeight);
+            Measure(size);
+            Arrange(new Rect(size));
 
             // Create a render bitmap and push the surface to it
-            this.UpdateLayout();
+            UpdateLayout();
             new PrintDialog().PrintVisual(this, "Report");
         }
 
         private void RunModule_OnClick(object sender, RoutedEventArgs e)
         {
-            if (PluginsListView.SelectedItem != null && PluginsListView.SelectedItem is IPlugin)
+            if (!(PluginsListView.SelectedItem is IPlugin))
             {
-                (PluginsListView.SelectedItem as IPlugin).Run(GridPanel);
+                MessageBox.Show("Error with plugin. Aborting.");
+                return;
             }
+
+            var plugin = (IPlugin) PluginsListView.SelectedItem;
+            GridPanel.Children.Clear();
+            GridPanel.Children.Add(plugin.Control);
         }
     }
 }

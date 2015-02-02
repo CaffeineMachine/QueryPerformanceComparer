@@ -1,4 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <module name="typeMapping">
-  <bind service="QueryPerformance.Interfaces.IPlugin, QueryPerformance.Interfaces" to="BillProcessorServicePlugin.BillProcessorServicePlugin, BillProcessorServicePlugin"/>
+  <bind service="QueryPerformance.Interfaces.IPlugin, QueryPerformance.Interfaces" to="QueryPerformance.DefaultPlugins.TestByCountPlugin, QueryPerformance.DefaultPlugins">
+    <metadata key="class" value="plugin" />
+  </bind>
+  <bind service="QueryPerformance.Interfaces.IPlugin, QueryPerformance.Interfaces" to="QueryPerformance.DefaultPlugins.TestByDurationPlugin, QueryPerformance.DefaultPlugins">
+    <metadata key="class" value="plugin" />
+  </bind>
 </module>

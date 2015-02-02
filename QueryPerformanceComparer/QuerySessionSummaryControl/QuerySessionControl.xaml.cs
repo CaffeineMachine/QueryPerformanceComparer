@@ -29,7 +29,7 @@ namespace QuerySessionSummaryControl
         private void RunTests_OnClick(object sender, RoutedEventArgs e)
         {
             var wrapper = new WebClientPerfWrapper();
-            var results = new List<Tuple<TimeSpan, string>>();
+            var results = new List<Tuple<TimeSpan, string, string>>();
             int numTries;
             var request = string.Format("{0}?{1}", UrlPath.Text, Query.Text);
             if (!Int32.TryParse(Tries.Text, out numTries))
@@ -56,7 +56,7 @@ namespace QuerySessionSummaryControl
             }
             else
             {
-                ReportSummary.MergeDataToChart(request, results.Select(x => x.Item1).ToList(), results.Select(x => x.Item1).ToList());
+                ReportSummary.MergeDataToChart(request, results.Select(x => x.Item1).ToList());
                 var newModelData = ReportSummary.StatSummary.ViewModel.Runtimes;
                 foreach (var item in results.Select(x => x.Item1).ToList())
                     newModelData.Add(item);
