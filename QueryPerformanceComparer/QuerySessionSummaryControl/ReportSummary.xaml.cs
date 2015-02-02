@@ -18,6 +18,7 @@ namespace QuerySessionSummaryControl
         public ReportSummary()
         {
             InitializeComponent();
+            _index = 0;
             _individualRuntimeChart = new Chart();
             _cumulativeRuntimeChart = new Chart();
         }
@@ -31,9 +32,7 @@ namespace QuerySessionSummaryControl
             _individualRuntimeChart.ChartAreas[0].AxisY.Title = "Runtime (Milliseconds)";
             _individualRuntimeChart.ChartAreas[0].AxisY.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
             _individualRuntimeChart.BackColor = Color.White;
-            _individualRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.Emboss;
-            _individualRuntimeChart.BorderlineColor = Color.Black;
-            _individualRuntimeChart.BorderlineWidth = 3;
+            _individualRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.None;
 
             _cumulativeRuntimeChart.ChartAreas.Add("chtArea");
             CumulativeGraphControlHost.Child = _cumulativeRuntimeChart;
@@ -42,9 +41,7 @@ namespace QuerySessionSummaryControl
             _cumulativeRuntimeChart.ChartAreas[0].AxisY.Title = "Runtime (Milliseconds)";
             _cumulativeRuntimeChart.ChartAreas[0].AxisY.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
             _cumulativeRuntimeChart.BackColor = Color.White;
-            _cumulativeRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.Emboss;
-            _cumulativeRuntimeChart.BorderlineColor = Color.Black;
-            _cumulativeRuntimeChart.BorderlineWidth = 3;
+            _cumulativeRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.None;
         }
 
         private void DataLabels_OnChecked(object sender, RoutedEventArgs e)
@@ -56,6 +53,39 @@ namespace QuerySessionSummaryControl
         }
 
         private int _index;
+        public void AddDataToChart(string request, List<TimeSpan> runtimes, List<TimeSpan> aggregateRuntimes)
+        {
+            _individualRuntimeChart.Legends.Add(request);
+            _individualRuntimeChart.Series.Add(request);
+            _individualRuntimeChart.Series[_index].ChartType = SeriesChartType.Line;
+            var milliseconds = runtimes.Select(x => x.TotalMilliseconds).ToList();
+            int trialNum = 0;
+            var trials = milliseconds.Select(item => ++trialNum).ToList();
+            _individualRuntimeChart.Series[_index].Points.DataBindXY(trials, "Runs", milliseconds, "Runtime (Milliseconds)");
+            _individualRuntimeChart.Legends[_index].LegendStyle = LegendStyle.Table;
+            _individualRuntimeChart.Legends[_index].TableStyle = LegendTableStyle.Tall;
+            _individualRuntimeChart.Legends[_index].Docking = Docking.Bottom;
+            _individualRuntimeChart.ChartAreas[0].AxisY.Minimum = aggregateRuntimes.Min().TotalMilliseconds;
+            _individualRuntimeChart.ChartAreas[0].AxisY.Maximum = aggregateRuntimes.Max().TotalMilliseconds;
+            _individualRuntimeChart.ChartAreas[0].AxisX.Minimum = trials.Min();
+            _individualRuntimeChart.ChartAreas[0].AxisX.Maximum = trials.Max();
+
+            _cumulativeRuntimeChart.Legends.Add(request);
+            _cumulativeRuntimeChart.Series.Add(request);
+            _cumulativeRuntimeChart.Series[_index].ChartType = SeriesChartType.Line;
+            var cumulativeMiliseconds = GetAggregate(runtimes).ToList();
+            _cumulativeRuntimeChart.Series[_index].Points.DataBindXY(trials, "Runs", cumulativeMiliseconds, "Runtime (Milliseconds)");
+            _cumulativeRuntimeChart.Legends[_index].LegendStyle = LegendStyle.Table;
+            _cumulativeRuntimeChart.Legends[_index].TableStyle = LegendTableStyle.Tall;
+            _cumulativeRuntimeChart.Legends[_index].Docking = Docking.Bottom;
+            _cumulativeRuntimeChart.ChartAreas[0].AxisY.Minimum = 0;
+            _cumulativeRuntimeChart.ChartAreas[0].AxisY.Maximum = cumulativeMiliseconds.Max();
+            _cumulativeRuntimeChart.ChartAreas[0].AxisX.Minimum = 0;
+            _cumulativeRuntimeChart.ChartAreas[0].AxisX.Maximum = trials.Max();
+
+            _index++;
+        }
+
         public void AddDataToChart(string request, List<TimeSpan> runtimes)
         {
             _individualRuntimeChart.Legends.Add(request);

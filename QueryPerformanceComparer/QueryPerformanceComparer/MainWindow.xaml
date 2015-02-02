@@ -16,12 +16,20 @@
         </Menu>
         <Grid x:Name="GridPanel" Grid.Row="1">
             <Grid x:Name="StartMenu">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Grid.Row="0" Click="DurationTest_Click">Run Test For Duration</Button>
-                <Button Grid.Column="1" Grid.Row="0" Click="QuantityTest_Click">Run Test By Count</Button>
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <ListView Grid.Row="0" x:Name="PluginsListView">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayName}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ListView>
+                    <Button Grid.Row="1" Click="RunModule_OnClick">Run Plugin Module</Button>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>

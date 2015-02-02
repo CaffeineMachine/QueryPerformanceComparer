@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows;
 using Microsoft.Win32;
@@ -28,7 +29,7 @@ namespace QuerySessionSummaryControl
         private void RunTests_OnClick(object sender, RoutedEventArgs e)
         {
             var wrapper = new WebClientPerfWrapper();
-            var runtimes = new List<TimeSpan>();
+            var results = new List<Tuple<TimeSpan, string, string>>();
             int numTries;
             var request = string.Format("{0}?{1}", UrlPath.Text, Query.Text);
             if (!Int32.TryParse(Tries.Text, out numTries))
@@ -43,24 +44,24 @@ namespace QuerySessionSummaryControl
             }
             for (var i = 0; i < numTries; i++)
             {
-                runtimes.Add(wrapper.RunPerformanceRequest(request));
+                results.Add(wrapper.RunPerformanceRequest(request));
             }
 
             if (!_requests.Contains(request))
             {
-                ReportSummary.AddDataToChart(request, runtimes);
-                ReportSummary.StatSummary.ViewModel = new StatSummaryViewModel(request, runtimes);
-                ReportSummary.IndividualRuntime.ViewModel = new IndividualRuntimeViewModel(runtimes);
+                ReportSummary.AddDataToChart(request, results.Select(x => x.Item1).ToList(), results.Select(x => x.Item1).ToList());
+                ReportSummary.StatSummary.ViewModel = new StatSummaryViewModel(request, results.Select(x => x.Item1).ToList());
+                ReportSummary.IndividualRuntime.ViewModel = new IndividualRuntimeViewModel(results.Select( x=> x.Item1).ToList());
                 _requests.Add(request);
             }
             else
             {
-                ReportSummary.MergeDataToChart(request, runtimes);
+                ReportSummary.MergeDataToChart(request, results.Select(x => x.Item1).ToList());
                 var newModelData = ReportSummary.StatSummary.ViewModel.Runtimes;
-                foreach (var item in runtimes)
+                foreach (var item in results.Select(x => x.Item1).ToList())
                     newModelData.Add(item);
                 ReportSummary.StatSummary.ViewModel = new StatSummaryViewModel(request, newModelData);
-                foreach (var item in runtimes)
+                foreach (var item in results.Select(x => x.Item1).ToList())
                     ReportSummary.IndividualRuntime.ViewModel.Runtimes.Add(item.TotalMilliseconds);
             }
 

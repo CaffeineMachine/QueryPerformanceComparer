@@ -30,5 +30,7 @@
         <Label Grid.Row="4" Grid.Column="1" Content="{Binding Median}" />
         <Label Grid.Row="5" Grid.Column="0">Total Runtime:</Label>
         <Label Grid.Row="5" Grid.Column="1" Content="{Binding TotalRuntime}" />
+        <Label Grid.Row="6" Grid.Column="0">Standard Deviation:</Label>
+        <Label Grid.Row="6" Grid.Column="1" Content="{Binding StdDev}"/>
     </Grid>
 </UserControl>

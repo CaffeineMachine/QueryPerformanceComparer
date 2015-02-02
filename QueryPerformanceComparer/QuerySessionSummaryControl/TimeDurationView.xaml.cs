@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms.DataVisualization.Charting;
@@ -41,9 +42,7 @@ namespace QuerySessionSummaryControl
             _cumulativeRuntimeChart.ChartAreas[0].AxisY.TitleFont = new Font(
                 System.Drawing.FontFamily.GenericSansSerif, 12);
             _cumulativeRuntimeChart.BackColor = Color.White;
-            _cumulativeRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.Emboss;
-            _cumulativeRuntimeChart.BorderlineColor = Color.Black;
-            _cumulativeRuntimeChart.BorderlineWidth = 3;
+            _cumulativeRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.None;
 
             _individualRuntimeChart = new Chart();
             _individualRuntimeChart.ChartAreas.Add("chtArea");
@@ -55,9 +54,7 @@ namespace QuerySessionSummaryControl
             _individualRuntimeChart.ChartAreas[0].AxisY.TitleFont = new Font(
                 System.Drawing.FontFamily.GenericSansSerif, 12);
             _individualRuntimeChart.BackColor = Color.White;
-            _individualRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.Emboss;
-            _individualRuntimeChart.BorderlineColor = Color.Black;
-            _individualRuntimeChart.BorderlineWidth = 3;
+            _individualRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.None;
         }
 
         private void LoadQueries_OnClick(object sender, RoutedEventArgs e)
@@ -152,7 +149,7 @@ namespace QuerySessionSummaryControl
             int index = 0;
             foreach (var url in urls)
             {
-                csvBuilder.Append(url + ",");
+                csvBuilder.Append(url + ",Result Count,");
             }
             csvBuilder.AppendLine("Query,");
 
@@ -176,8 +173,15 @@ namespace QuerySessionSummaryControl
                             var request = string.Format("{0}?{1}", url, query);
                             var responseTime = wrapper.RunPerformanceRequest(request);
                             var match = durationViewModel.Summaries.First(x => x.Request == url);
-                            durationViewModel.Summaries.First(x => x.Request == url).Runtimes.Add(responseTime);
-                            csvBuilder.Append(string.Format("{0},", responseTime.TotalMilliseconds));
+                            durationViewModel.Summaries.First(x => x.Request == url).Runtimes.Add(responseTime.Item1);
+                            csvBuilder.Append(string.Format("{0},", responseTime.Item1.TotalMilliseconds));
+                            var docMatch = Regex.Match(responseTime.Item2, @"Results \d+ through \d+ out of (?'results'\d+) matches");
+                            if (Regex.IsMatch(responseTime.Item2, @"Results \d+ through \d+ out of (?'results'\d+) matches"))
+                                csvBuilder.Append(string.Format("{0},", Int32.Parse(docMatch.Groups["results"].ToString())));
+                            else
+                            {
+                                csvBuilder.Append("0,");
+                            }
                         }
                         csvBuilder.AppendLine(string.Format("{0},", query));
                     }
@@ -289,7 +293,7 @@ namespace QuerySessionSummaryControl
             }
         }
 
-        private ConcurrentQueue<Tuple<string, TimeSpan>> _concurrentRuntimes = new ConcurrentQueue<Tuple<string, TimeSpan>>();
+        private ConcurrentQueue<Tuple<string, TimeSpan, string>> _concurrentRuntimes = new ConcurrentQueue<Tuple<string, TimeSpan, string>>();
         private void LoadTests_OnClick(object sender, RoutedEventArgs e)
         {
             int time = 0, threads = 0;
@@ -329,9 +333,6 @@ namespace QuerySessionSummaryControl
                 int index = 0;
                 foreach (var query in queries)
                 {
-                    if (sw.ElapsedMilliseconds >= time * 60 * 1000)
-                        break;
-
                     if (urls.Any())
                     {
                         // Build one request for each url.
@@ -344,13 +345,13 @@ namespace QuerySessionSummaryControl
                                                         {
                                                             var runtime = wrapper.RunPerformanceRequest(
                                                                 req);
-                                                            _concurrentRuntimes.Enqueue(new Tuple<string, TimeSpan>(req, runtime));
+                                                            _concurrentRuntimes.Enqueue(new Tuple<string, TimeSpan, string>(req, runtime.Item1, runtime.Item2));
                                                         });
                             thread.Start();
                         }
 
                         index++;
-                        if (index%threads == 0)
+                        if (index % threads == 0)
                         {
                             Thread.Sleep(1000);
                         }
@@ -386,7 +387,14 @@ namespace QuerySessionSummaryControl
             var sb = new StringBuilder();
             foreach (var tuple in _concurrentRuntimes)
             {
-                sb.AppendLine(string.Format("{0},{1},", tuple.Item1, tuple.Item2.TotalMilliseconds));
+                var responseDoc = tuple.Item3.ToString();
+                var results = 0;
+                if (Regex.IsMatch(responseDoc, @"Results \d+ through \d+ out of (?'results'\d+) matches"))
+                {
+                    var match = Regex.Match(responseDoc, @"Results \d+ through \d+ out of (?'results'\d+) matches");
+                    results = Int32.Parse(match.Groups["results"].ToString());
+                }
+                sb.AppendLine(string.Format("{0},{1},{2},", tuple.Item1, tuple.Item2.TotalMilliseconds, results));
             }
 
             return sb.ToString();
