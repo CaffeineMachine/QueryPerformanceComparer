@@ -45,10 +45,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BillProcessorServicePlugin\QueryPerformance.ThreadedPerformanceSessionPlugin.csproj">
-      <Project>{BC6A5AC8-BCBC-4EB0-AA07-DF7AE4D47F31}</Project>
-      <Name>QueryPerformance.ThreadedPerformanceSessionPlugin</Name>
-    </ProjectReference>
     <ProjectReference Include="..\QueryPerformance.Interfaces\QueryPerformance.Interfaces.csproj">
       <Project>{69942088-5E4C-4A39-81B0-CFA17104C073}</Project>
       <Name>QueryPerformance.Interfaces</Name>
