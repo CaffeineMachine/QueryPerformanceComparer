@@ -121,6 +121,10 @@
       <Project>{69942088-5E4C-4A39-81B0-CFA17104C073}</Project>
       <Name>QueryPerformance.Interfaces</Name>
     </ProjectReference>
+    <ProjectReference Include="..\QueryPerformance.Utilities\QueryPerformance.Utilities.csproj">
+      <Project>{29723B8B-D618-4F78-BE55-FAF34DBBF8DF}</Project>
+      <Name>QueryPerformance.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\QuerySessionSummaryControl\QuerySessionSummaryControl.csproj">
       <Project>{4c937918-5ea4-486c-a265-87fef98c1e06}</Project>
       <Name>QuerySessionSummaryControl</Name>

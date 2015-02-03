@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Windows.Forms.Integration;
 
 namespace QuerySessionSummaryControl
 {
@@ -13,7 +14,7 @@ namespace QuerySessionSummaryControl
     public partial class ReportSummary
     {
         // ReSharper disable FieldCanBeMadeReadOnly.Local
-        private Chart _individualRuntimeChart, _cumulativeRuntimeChart;
+        private Chart _individualRuntimeChart, _cumulativeRuntimeChart, _runtimeDistributionChart;
         // ReSharper restore FieldCanBeMadeReadOnly.Local
         public ReportSummary()
         {
@@ -21,27 +22,27 @@ namespace QuerySessionSummaryControl
             _index = 0;
             _individualRuntimeChart = new Chart();
             _cumulativeRuntimeChart = new Chart();
+            _runtimeDistributionChart = new Chart();
         }
 
         public void GenerateChart()
         {
-            _individualRuntimeChart.ChartAreas.Add("chtArea");
-            ControlHost.Child = _individualRuntimeChart;
-            _individualRuntimeChart.ChartAreas[0].AxisX.Title = "Runs";
-            _individualRuntimeChart.ChartAreas[0].AxisX.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
-            _individualRuntimeChart.ChartAreas[0].AxisY.Title = "Runtime (Milliseconds)";
-            _individualRuntimeChart.ChartAreas[0].AxisY.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
-            _individualRuntimeChart.BackColor = Color.White;
-            _individualRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.None;
+            var titleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
+            GenerateChart(_individualRuntimeChart, "Runs", "Runtime (Milliseconds)", titleFont, ControlHost);
+            GenerateChart(_cumulativeRuntimeChart, "Runs", "Cumulative Runtime (Milliseconds)", titleFont, CumulativeGraphControlHost);
+            GenerateChart(_runtimeDistributionChart, "Runtime (Milliseconds)", "Frequency", titleFont, RuntimeDistributionFormsHost);
+        }
 
-            _cumulativeRuntimeChart.ChartAreas.Add("chtArea");
-            CumulativeGraphControlHost.Child = _cumulativeRuntimeChart;
-            _cumulativeRuntimeChart.ChartAreas[0].AxisX.Title = "Runs";
-            _cumulativeRuntimeChart.ChartAreas[0].AxisX.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
-            _cumulativeRuntimeChart.ChartAreas[0].AxisY.Title = "Runtime (Milliseconds)";
-            _cumulativeRuntimeChart.ChartAreas[0].AxisY.TitleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
-            _cumulativeRuntimeChart.BackColor = Color.White;
-            _cumulativeRuntimeChart.BorderSkin.SkinStyle = BorderSkinStyle.None;
+        private static void GenerateChart(Chart chartReference, string xTitle, string yTitle, Font titleFont, WindowsFormsHost host)
+        {
+            chartReference.ChartAreas.Add("chtArea");
+            host.Child = chartReference;
+            chartReference.ChartAreas[0].AxisX.Title = xTitle;
+            chartReference.ChartAreas[0].AxisX.TitleFont = titleFont;
+            chartReference.ChartAreas[0].AxisY.Title = yTitle;
+            chartReference.ChartAreas[0].AxisY.TitleFont = titleFont;
+            chartReference.BackColor = Color.White;
+            chartReference.BorderSkin.SkinStyle = BorderSkinStyle.None;
         }
 
         private void DataLabels_OnChecked(object sender, RoutedEventArgs e)
@@ -59,7 +60,7 @@ namespace QuerySessionSummaryControl
             _individualRuntimeChart.Series.Add(request);
             _individualRuntimeChart.Series[_index].ChartType = SeriesChartType.Line;
             var milliseconds = runtimes.Select(x => x.TotalMilliseconds).ToList();
-            int trialNum = 0;
+            var trialNum = 0;
             var trials = milliseconds.Select(item => ++trialNum).ToList();
             _individualRuntimeChart.Series[_index].Points.DataBindXY(trials, "Runs", milliseconds, "Runtime (Milliseconds)");
             _individualRuntimeChart.Legends[_index].LegendStyle = LegendStyle.Table;
@@ -73,13 +74,16 @@ namespace QuerySessionSummaryControl
             _cumulativeRuntimeChart.Legends.Add(request);
             _cumulativeRuntimeChart.Series.Add(request);
             _cumulativeRuntimeChart.Series[_index].ChartType = SeriesChartType.Line;
-            var cumulativeMiliseconds = GetAggregate(runtimes).ToList();
-            _cumulativeRuntimeChart.Series[_index].Points.DataBindXY(trials, "Runs", cumulativeMiliseconds, "Runtime (Milliseconds)");
+            var cumulativeMilliseconds = new List<double>{0};
+            cumulativeMilliseconds.AddRange(GetAggregate(runtimes).ToList());
+            trialNum = 0;
+            trials = cumulativeMilliseconds.Select(item => trialNum++).ToList();
+            _cumulativeRuntimeChart.Series[_index].Points.DataBindXY(trials, "Runs", cumulativeMilliseconds, "Runtime (Milliseconds)");
             _cumulativeRuntimeChart.Legends[_index].LegendStyle = LegendStyle.Table;
             _cumulativeRuntimeChart.Legends[_index].TableStyle = LegendTableStyle.Tall;
             _cumulativeRuntimeChart.Legends[_index].Docking = Docking.Bottom;
             _cumulativeRuntimeChart.ChartAreas[0].AxisY.Minimum = 0;
-            _cumulativeRuntimeChart.ChartAreas[0].AxisY.Maximum = cumulativeMiliseconds.Max();
+            _cumulativeRuntimeChart.ChartAreas[0].AxisY.Maximum = cumulativeMilliseconds.Max();
             _cumulativeRuntimeChart.ChartAreas[0].AxisX.Minimum = 0;
             _cumulativeRuntimeChart.ChartAreas[0].AxisX.Maximum = trials.Max();
 
@@ -106,13 +110,17 @@ namespace QuerySessionSummaryControl
             _cumulativeRuntimeChart.Legends.Add(request);
             _cumulativeRuntimeChart.Series.Add(request);
             _cumulativeRuntimeChart.Series[_index].ChartType = SeriesChartType.Line;
-            var cumulativeMiliseconds = GetAggregate(runtimes).ToList();
-            _cumulativeRuntimeChart.Series[_index].Points.DataBindXY(trials, "Runs", cumulativeMiliseconds, "Runtime (Milliseconds)");
+            var cumulativeMilliseconds = new List<double>{0};
+            cumulativeMilliseconds.AddRange(GetAggregate(runtimes).ToList());
+            trialNum = 0;
+            trials = cumulativeMilliseconds.Select(item => trialNum++).ToList();
+            _cumulativeRuntimeChart.Series[_index].Points.DataBindXY(trials, "Runs", cumulativeMilliseconds, "Runtime (Milliseconds)");
             _cumulativeRuntimeChart.Legends[_index].LegendStyle = LegendStyle.Table;
             _cumulativeRuntimeChart.Legends[_index].TableStyle = LegendTableStyle.Tall;
             _cumulativeRuntimeChart.Legends[_index].Docking = Docking.Bottom;
             _cumulativeRuntimeChart.ChartAreas[_index].AxisY.Minimum = 0;
-            _cumulativeRuntimeChart.ChartAreas[_index].AxisY.Maximum = cumulativeMiliseconds.Max();
+            _cumulativeRuntimeChart.ChartAreas[0].AxisY.Maximum = Double.IsNaN(_cumulativeRuntimeChart.ChartAreas[0].AxisY.Maximum) ?
+                cumulativeMilliseconds.Max() : Math.Max(cumulativeMilliseconds.Max(), _cumulativeRuntimeChart.ChartAreas[_index].AxisY.Maximum);
             _cumulativeRuntimeChart.ChartAreas[_index].AxisX.Minimum = 0;
             _cumulativeRuntimeChart.ChartAreas[_index].AxisX.Maximum = trials.Max();
 
@@ -122,13 +130,9 @@ namespace QuerySessionSummaryControl
         private IEnumerable<double> GetAggregate(List<TimeSpan> runtimes)
         {
             var aggregates = new List<double>();
-            var index = 1;
-#pragma warning disable 168
-            foreach (var item in runtimes)
-#pragma warning restore 168
+            for (var i = 1; i <= runtimes.Count; i++)
             {
-                aggregates.Add(runtimes.Take(index).Sum(x => x.TotalMilliseconds));
-                index++;
+                aggregates.Add(runtimes.Take(i).Sum(x => x.TotalMilliseconds));
             }
             return aggregates;
         }

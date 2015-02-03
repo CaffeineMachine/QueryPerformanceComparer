@@ -31,6 +31,16 @@
             <TabItem Header="Individual Runtimes Grid">
                 <querySessionSummaryControl:IndividualRuntimeControl x:Name="IndividualRuntime" x:FieldModifier="public"/>
             </TabItem>
+            <TabItem Header="Runtime Distribution Graph">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <ListView x:Name="DistributionRequests" />
+                    <WindowsFormsHost Grid.Row="1" Name="RuntimeDistributionFormsHost" Grid.ColumnSpan="4"/>
+                </Grid>
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>
