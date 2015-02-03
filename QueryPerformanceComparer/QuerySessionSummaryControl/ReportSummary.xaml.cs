@@ -26,9 +26,10 @@ namespace QuerySessionSummaryControl
             _cumulativeRuntimeChart = new Chart();
             _runtimeDistributionChart = new Chart();
             _runtimes = new List<TimeSpan>();
+            GenerateChart();
         }
 
-        public void GenerateChart()
+        private void GenerateChart()
         {
             var titleFont = new Font(System.Drawing.FontFamily.GenericSansSerif, 12);
             GenerateChart(_individualRuntimeChart, "Runs", "Runtime (Milliseconds)", titleFont, ControlHost);
@@ -59,7 +60,9 @@ namespace QuerySessionSummaryControl
         private int _index;
         public void AddDataToChart(string request, List<TimeSpan> runtimes, List<TimeSpan> aggregateRuntimes)
         {
-            _individualRuntimeChart.Legends.Add(request);
+            if (_individualRuntimeChart.Legends.FindByName(request) == null)
+                _individualRuntimeChart.Legends.Add(request);
+
             _individualRuntimeChart.Series.Add(request);
             _individualRuntimeChart.Series[_index].ChartType = SeriesChartType.Line;
             var milliseconds = runtimes.Select(x => x.TotalMilliseconds).ToList();

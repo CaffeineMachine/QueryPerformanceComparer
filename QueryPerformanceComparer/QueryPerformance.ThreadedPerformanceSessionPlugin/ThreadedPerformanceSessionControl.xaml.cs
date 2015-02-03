@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +22,6 @@ namespace QueryPerformance.ThreadedPerformanceSessionPlugin
         public ThreadedPerformanceSessionControl()
         {
             InitializeComponent();
-            ReportSummary.GenerateChart();
             _testUrls = new List<string>();
             IKernel kernel = new StandardKernel();
             LibraryLoader.LoadAllBinDirectoryAssemblies();
@@ -33,6 +33,10 @@ namespace QueryPerformance.ThreadedPerformanceSessionPlugin
 
         private async void RunTests_OnClick(object sender, RoutedEventArgs e)
         {
+            if (UrlGeneratorPlugins.SelectedItem == null) return;
+            if (!(UrlGeneratorPlugins.SelectedItem is IThreadedPerformanceSessionTestUrlGenerator)) return;
+            _testUrls = (UrlGeneratorPlugins.SelectedItem as IThreadedPerformanceSessionTestUrlGenerator).GenerateTests();
+
             var wrapper = new WebClientPerfWrapper();
             var results = new List<Tuple<TimeSpan, string, string>>();
             var numTries = Int32.Parse(TrialsTextBox.Text);
@@ -43,7 +47,8 @@ namespace QueryPerformance.ThreadedPerformanceSessionPlugin
                 if (string.IsNullOrEmpty(request)) continue;
 
                 var tasks = Enumerable.Range(0, numTries).Select(x => wrapper.RunPerformanceRequestTask(request));
-                var newResults = await Task.WhenAll(tasks);
+                var taskResults = await Task.WhenAll(tasks);
+                var newResults = taskResults.Where(x => x != null).ToList();
                 results.AddRange(newResults);
                 ReportSummary.AddDataToChart(request, newResults.Select(x => x.Item1).ToList(), results.Select(x => x.Item1).ToList());
                 ReportSummary.StatSummary.ViewModel.Requests.Add(request);
@@ -56,11 +61,6 @@ namespace QueryPerformance.ThreadedPerformanceSessionPlugin
         private void SerializeResults_OnClick(object sender, RoutedEventArgs e)
         {
 
-        }
-
-        private void GenerateTests_OnClick(object sender, RoutedEventArgs e)
-        {
-            _testUrls = (UrlGeneratorPlugins.SelectedItem as IThreadedPerformanceSessionTestUrlGenerator).GenerateTests();
         }
     }
 }

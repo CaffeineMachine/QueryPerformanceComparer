@@ -22,7 +22,6 @@ namespace QuerySessionSummaryControl
         public QuerySessionControl()
         {
             InitializeComponent();
-            ReportSummary.GenerateChart();
             _requests = new List<string>();
         }
 
