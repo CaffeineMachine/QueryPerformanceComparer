@@ -5,21 +5,20 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Label Grid.Row="0" Grid.Column="0">Request:</Label>
-        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Request}" IsReadOnly="True"/>
+        <ListView Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Requests}" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto"></ListView>
         <Label Grid.Row="1" Grid.Column="0">Minimum:</Label>
         <Label Grid.Row="1" Grid.Column="1" Content="{Binding Minimum}"/>
         <Label Grid.Row="2" Grid.Column="0">Maximum:</Label>

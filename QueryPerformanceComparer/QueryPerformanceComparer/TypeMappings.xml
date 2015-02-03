@@ -6,4 +6,10 @@
   <bind service="QueryPerformance.Interfaces.IPlugin, QueryPerformance.Interfaces" to="QueryPerformance.DefaultPlugins.TestByDurationPlugin, QueryPerformance.DefaultPlugins">
     <metadata key="class" value="plugin" />
   </bind>
+  <bind service="QueryPerformance.Interfaces.IPlugin, QueryPerformance.Interfaces" to="QueryPerformance.ThreadedPerformanceSessionPlugin.ThreadedPerformancePlugin, QueryPerformance.ThreadedPerformanceSessionPlugin">
+    <metadata key="class" value="plugin" />
+  </bind>
+  <bind service="QueryPerformance.Interfaces.IThreadedPerformanceSessionTestUrlGenerator, QueryPerformance.Interfaces" to="TLC.Plugins.BillProcessorServiceTestCaseGenerator, TLC.Plugins">
+    <metadata key="class" value="threadedPerformanceSessionPlugin" />
+  </bind>
 </module>

@@ -1,11 +1,10 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using Ninject;
 using QueryPerformance.Interfaces;
+using QueryPerformance.Utilities;
 
 namespace QueryPerformanceComparer
 {
@@ -18,7 +17,7 @@ namespace QueryPerformanceComparer
         {
             InitializeComponent();
             IKernel kernel = new StandardKernel();
-            LoadAllBinDirectoryAssemblies();
+            LibraryLoader.LoadAllBinDirectoryAssemblies();
             if (File.Exists("TypeMappings.xml"))
                 kernel.Load("TypeMappings.xml");
             var plugins = kernel.GetAll<IPlugin>().ToList();
@@ -28,24 +27,6 @@ namespace QueryPerformanceComparer
         private void Quit_OnClick(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
-        }
-
-        private void LoadAllBinDirectoryAssemblies()
-        {
-            var binPath = AppDomain.CurrentDomain.BaseDirectory; // note: don't use CurrentEntryAssembly or anything like that.
-
-            foreach (var dll in Directory.GetFiles(binPath, "*.dll", SearchOption.AllDirectories))
-            {
-                try
-                {
-                    Assembly.LoadFile(dll);
-                }
-                catch (FileLoadException)
-                { } // The Assembly has already been loaded.
-                catch (BadImageFormatException)
-                { } // If a BadImageFormatException exception is thrown, the file is not an assembly.
-
-            } // foreach dll
         }
 
         private void ReturnToMenu_OnClick(object sender, RoutedEventArgs e)

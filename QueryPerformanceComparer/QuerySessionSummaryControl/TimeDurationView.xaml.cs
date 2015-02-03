@@ -172,8 +172,8 @@ namespace QuerySessionSummaryControl
                                 break;
                             var request = string.Format("{0}?{1}", url, query);
                             var responseTime = wrapper.RunPerformanceRequest(request);
-                            var match = durationViewModel.Summaries.First(x => x.Request == url);
-                            durationViewModel.Summaries.First(x => x.Request == url).Runtimes.Add(responseTime.Item1);
+                            var match = durationViewModel.Summaries.First(x => x.Requests.Contains(url));
+                            durationViewModel.Summaries.First(x => x.Requests.Contains(url)).Runtimes.Add(responseTime.Item1);
                             csvBuilder.Append(string.Format("{0},", responseTime.Item1.TotalMilliseconds));
                             var docMatch = Regex.Match(responseTime.Item2, @"Results \d+ through \d+ out of (?'results'\d+) matches");
                             if (Regex.IsMatch(responseTime.Item2, @"Results \d+ through \d+ out of (?'results'\d+) matches"))
@@ -211,7 +211,7 @@ namespace QuerySessionSummaryControl
             var timespanMin = durationViewModel.Summaries.Select(x => x.Runtimes.Min()).Min().TotalMilliseconds;
             foreach (var url in urls)
             {
-                var timespans = durationViewModel.Summaries.First(x => x.Request == url).Runtimes.ToList();
+                var timespans = durationViewModel.Summaries.First(x => x.Requests.Contains(url)).Runtimes.ToList();
                 var cumulativeMiliseconds = GetAggregate(timespans).ToList();
                 int trialNum = 0;
                 var trials = timespans.Select(item => ++trialNum).ToList();
