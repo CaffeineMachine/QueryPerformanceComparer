@@ -44,7 +44,9 @@ namespace QuerySessionSummaryControl
             }
             for (var i = 0; i < numTries; i++)
             {
-                results.Add(wrapper.RunPerformanceRequest(request));
+                var result = wrapper.RunPerformanceRequest(request);
+                if (result != null)
+                    results.Add(result);
             }
 
             if (!_requests.Contains(request))

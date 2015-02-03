@@ -11,24 +11,32 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" HorizontalAlignment="Left" Orientation="Vertical">
-            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
-                <ListView x:Name="UrlGeneratorPlugins" >
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ListView Grid.Column="0" x:Name="UrlGeneratorPlugins" >
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding DisplayName}" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ListView>
-                <Button Click="GenerateTests_OnClick">Generate Test Urls</Button>
-            </StackPanel>
-            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                <Button Grid.Column="1" Click="GenerateTests_OnClick">Generate Test Urls</Button>
+            </Grid>
+            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Grid.Row="1">
                 <TextBox Width="30" x:Name="TrialsTextBox"></TextBox>
                 <Label>Trials</Label>
                 <Button Click="RunTests_OnClick">Run Tests:</Button>
                 <Button Click="SerializeResults_OnClick">Serialize Results:</Button>
             </StackPanel>
-        </StackPanel>
+        </Grid>
         <querySessionSummaryControl:ReportSummary Grid.Row="1" x:Name="ReportSummary" x:FieldModifier="public"/>
     </Grid>
 </UserControl>

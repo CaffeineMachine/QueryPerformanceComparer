@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Windows.Forms.Integration;
+using QuerySessionSummaryLib;
 
 namespace QuerySessionSummaryControl
 {
@@ -15,6 +16,7 @@ namespace QuerySessionSummaryControl
     {
         // ReSharper disable FieldCanBeMadeReadOnly.Local
         private Chart _individualRuntimeChart, _cumulativeRuntimeChart, _runtimeDistributionChart;
+        private List<TimeSpan> _runtimes;
         // ReSharper restore FieldCanBeMadeReadOnly.Local
         public ReportSummary()
         {
@@ -23,6 +25,7 @@ namespace QuerySessionSummaryControl
             _individualRuntimeChart = new Chart();
             _cumulativeRuntimeChart = new Chart();
             _runtimeDistributionChart = new Chart();
+            _runtimes = new List<TimeSpan>();
         }
 
         public void GenerateChart()
@@ -62,6 +65,8 @@ namespace QuerySessionSummaryControl
             var milliseconds = runtimes.Select(x => x.TotalMilliseconds).ToList();
             var trialNum = 0;
             var trials = milliseconds.Select(item => ++trialNum).ToList();
+            //_runtimes.Clear();
+            _runtimes.AddRange(runtimes);
             _individualRuntimeChart.Series[_index].Points.DataBindXY(trials, "Runs", milliseconds, "Runtime (Milliseconds)");
             _individualRuntimeChart.Legends[_index].LegendStyle = LegendStyle.Table;
             _individualRuntimeChart.Legends[_index].TableStyle = LegendTableStyle.Tall;
@@ -74,7 +79,7 @@ namespace QuerySessionSummaryControl
             _cumulativeRuntimeChart.Legends.Add(request);
             _cumulativeRuntimeChart.Series.Add(request);
             _cumulativeRuntimeChart.Series[_index].ChartType = SeriesChartType.Line;
-            var cumulativeMilliseconds = new List<double>{0};
+            var cumulativeMilliseconds = new List<double> { 0 };
             cumulativeMilliseconds.AddRange(GetAggregate(runtimes).ToList());
             trialNum = 0;
             trials = cumulativeMilliseconds.Select(item => trialNum++).ToList();
@@ -87,6 +92,24 @@ namespace QuerySessionSummaryControl
             _cumulativeRuntimeChart.ChartAreas[0].AxisX.Minimum = 0;
             _cumulativeRuntimeChart.ChartAreas[0].AxisX.Maximum = trials.Max();
 
+            if (_runtimeDistributionChart.Series.Count == 0)
+                _runtimeDistributionChart.Series.Add("Distribution");
+            _runtimeDistributionChart.Series[0].ChartType = SeriesChartType.Column;
+            var ssvm = new StatSummaryViewModel("Distribution", _runtimes);
+            _runtimeDistributionChart.ChartAreas[0].AxisX.Minimum = ssvm.Mean - 3 * ssvm.StdDev;
+            _runtimeDistributionChart.ChartAreas[0].AxisX.Maximum = ssvm.Mean + 3 * ssvm.StdDev;
+            var xValues = new List<double>();
+            var yValues = new List<int>();
+            for (var x = _runtimeDistributionChart.ChartAreas[0].AxisX.Minimum + (0.3 * ssvm.StdDev);
+                x <= _runtimeDistributionChart.ChartAreas[0].AxisX.Maximum;
+                x += (0.3 * ssvm.StdDev))
+            {
+                xValues.Add(x);
+                yValues.Add(_runtimes.Count(y => y.TotalMilliseconds <= x && y.TotalMilliseconds > x - (0.3 * ssvm.StdDev)));
+            }
+            _runtimeDistributionChart.ChartAreas[0].AxisY.Minimum = 0;
+            _runtimeDistributionChart.ChartAreas[0].AxisY.Maximum = yValues.Max();
+            _runtimeDistributionChart.Series[0].Points.DataBindXY(xValues, "Runtime (Milliseconds)", yValues, "Frequency");
             _index++;
         }
 
@@ -110,7 +133,7 @@ namespace QuerySessionSummaryControl
             _cumulativeRuntimeChart.Legends.Add(request);
             _cumulativeRuntimeChart.Series.Add(request);
             _cumulativeRuntimeChart.Series[_index].ChartType = SeriesChartType.Line;
-            var cumulativeMilliseconds = new List<double>{0};
+            var cumulativeMilliseconds = new List<double> { 0 };
             cumulativeMilliseconds.AddRange(GetAggregate(runtimes).ToList());
             trialNum = 0;
             trials = cumulativeMilliseconds.Select(item => trialNum++).ToList();

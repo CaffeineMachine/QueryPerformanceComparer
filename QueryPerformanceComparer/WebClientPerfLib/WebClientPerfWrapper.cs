@@ -20,19 +20,26 @@ namespace WebClientPerfLib
             //req.Proxy = null;
             var sw = new Stopwatch();
             sw.Start();
-            using (var res = req.GetResponse())
+            try
             {
-                string responseDoc;
-                using (var s = res.GetResponseStream())
-                using (var sr = new StreamReader(s))
+                using (var res = req.GetResponse())
                 {
-                    responseDoc = sr.ReadToEnd();
-                    _documents.Add(responseDoc);
+                    string responseDoc;
+                    using (var s = res.GetResponseStream())
+                    using (var sr = new StreamReader(s))
+                    {
+                        responseDoc = sr.ReadToEnd();
+                        _documents.Add(responseDoc);
+                    }
+                    var elapsed = sw.Elapsed;
+                    _runtimes.Add(elapsed.TotalMilliseconds);
+                    result = new Tuple<TimeSpan, string, string>(elapsed, uri, responseDoc);
+                    sw.Reset();
                 }
-                var elapsed = sw.Elapsed;
-                _runtimes.Add(elapsed.TotalMilliseconds);
-                result = new Tuple<TimeSpan, string, string>(elapsed, uri, responseDoc);
-                sw.Reset();
+            }
+            catch (Exception)
+            {
+                return null;
             }
             return result;
         }
